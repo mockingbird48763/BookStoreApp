@@ -1,11 +1,14 @@
-using Microsoft.Extensions.Options;
+using BookStore.Data;
+using BookStore.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+// 依賴注入
+builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -19,6 +22,7 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "一個簡單的 API 用於管理書店的庫存、顧客與訂單"
     });
+    
 
     // xml 文檔絕對路徑
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -26,7 +30,16 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath, true);
     // 對 action 進行名稱排序
     options.OrderActionsBy(o => o.RelativePath);
+
+    // 開啟註解功能
+    // options.UseOneOfForPolymorphism();
+    // options.EnableAnnotations();
 });
+#endregion
+
+#region DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
 
 var app = builder.Build();
@@ -40,6 +53,11 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.EnsureDeleted(); // 每次啟動清空
+    context.Database.EnsureCreated(); // 重新建表
+    await SeedData.SeedAsync(app.Services); // 填充初始資料
 }
 
 app.UseAuthorization();

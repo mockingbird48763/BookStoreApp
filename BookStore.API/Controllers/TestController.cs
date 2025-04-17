@@ -1,3 +1,4 @@
+using BookStore.DTO.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.API.Controllers
@@ -17,6 +18,16 @@ namespace BookStore.API.Controllers
         public ActionResult<string> Get()
         {
             return "Hello";
+        }
+
+        /// <summary>
+        /// 這是一個問好的 API
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("hello")]
+        public ActionResult<string> Hello([FromBody] TestRequest request)
+        {
+            return "Hello, " + request.Name;
         }
     }
 }
