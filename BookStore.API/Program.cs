@@ -1,11 +1,14 @@
-using Microsoft.Extensions.Options;
+using BookStore.Data;
+using BookStore.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+// 依賴注入
+builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -20,13 +23,36 @@ builder.Services.AddSwaggerGen(options =>
         Description = "一個簡單的 API 用於管理書店的庫存、顧客與訂單"
     });
 
-    // xml 文檔絕對路徑
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);    // true 顯示 controller 註解
-    options.IncludeXmlComments(xmlPath, true);
+
+    // 讀取當前專案的 XML 註解
+    var baseXmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var baseXmlPath = Path.Combine(AppContext.BaseDirectory, baseXmlFile);
+    options.IncludeXmlComments(baseXmlPath, includeControllerXmlComments: true);
+
+    // 讀取類別庫的 XML 註解
+    var externalAssemblies = new[] { "BookStore.DTO", "BookStore.Models", "BookStore.Data" };
+    foreach (var assemblyName in externalAssemblies)
+    {
+        var xmlFile = $"{assemblyName}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        if (File.Exists(xmlPath)) // 確保 XML 檔案存在才載入
+        {
+            options.IncludeXmlComments(xmlPath);
+        }
+    }
+
     // 對 action 進行名稱排序
     options.OrderActionsBy(o => o.RelativePath);
+
+    // 開啟註解功能
+    // options.UseOneOfForPolymorphism();
+    // options.EnableAnnotations();
 });
+#endregion
+
+#region DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
 
 var app = builder.Build();
@@ -40,6 +66,11 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.EnsureDeleted(); // 每次啟動清空
+    context.Database.EnsureCreated(); // 重新建表
+    await SeedData.SeedAsync(app.Services); // 填充初始資料
 }
 
 app.UseAuthorization();
