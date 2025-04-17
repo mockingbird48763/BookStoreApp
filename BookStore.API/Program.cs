@@ -22,12 +22,25 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "一個簡單的 API 用於管理書店的庫存、顧客與訂單"
     });
-    
 
-    // xml 文檔絕對路徑
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);    // true 顯示 controller 註解
-    options.IncludeXmlComments(xmlPath, true);
+
+    // 讀取當前專案的 XML 註解
+    var baseXmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var baseXmlPath = Path.Combine(AppContext.BaseDirectory, baseXmlFile);
+    options.IncludeXmlComments(baseXmlPath, includeControllerXmlComments: true);
+
+    // 讀取類別庫的 XML 註解
+    var externalAssemblies = new[] { "BookStore.DTO", "BookStore.Models", "BookStore.Data" };
+    foreach (var assemblyName in externalAssemblies)
+    {
+        var xmlFile = $"{assemblyName}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        if (File.Exists(xmlPath)) // 確保 XML 檔案存在才載入
+        {
+            options.IncludeXmlComments(xmlPath);
+        }
+    }
+
     // 對 action 進行名稱排序
     options.OrderActionsBy(o => o.RelativePath);
 
