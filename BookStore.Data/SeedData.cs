@@ -38,6 +38,12 @@ namespace BookStore.Data
                         Email = "user@example.com",
                         Password = "$2a$11$VLzTLJL/pl7VDrEOJrS3quKL1zpRqtW5vSAwP46I/ILdsDPNLQU4m",
                         Roles = [user]
+                    },
+                    new Member
+                    {
+                        Email = "super@example.com",
+                        Password = "$2a$11$VLzTLJL/pl7VDrEOJrS3quKL1zpRqtW5vSAwP46I/ILdsDPNLQU4m",
+                        Roles = [admin, user]
                     }
             );
             await context.SaveChangesAsync();
