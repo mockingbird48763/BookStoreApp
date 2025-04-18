@@ -9,6 +9,7 @@ namespace BookStore.API.Controllers
     /// 書藉相關
     /// </summary>
     [ApiController]
+    [Route("api/[controller]")]
     public class BookController(IBookService bookService) : Controller
     {
         private readonly IBookService _bookService = bookService;
@@ -19,7 +20,7 @@ namespace BookStore.API.Controllers
         /// <returns>請求成功或失敗的訊息</returns>
         /// <response code="200">登入成功</response>
         /// <response code="400">請求格式錯誤</response>
-        [HttpGet("book")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetBooks([FromQuery] BookQueryParameters bookQueryParameters)
         {
