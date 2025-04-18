@@ -1,3 +1,4 @@
+using BookStore.API.Middleware;
 using BookStore.Core.Settings;
 using BookStore.Data;
 using BookStore.Services;
@@ -14,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 // 依賴注入
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBookService, BookService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -130,6 +133,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();  // 確保啟用認證
 app.UseAuthorization();   // 確保啟用授權
+app.UseStaticFiles(); // 確保已經啟用靜態檔案服務
+app.UseMiddleware<ExceptionMiddleware>(); // 全局異常處理器
 
 app.MapControllers();
 
