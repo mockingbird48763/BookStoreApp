@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BookStore.Core.Extensions;
+using BookStore.Core.Exceptions;
 
 namespace BookStore.Services
 {
@@ -55,6 +56,31 @@ namespace BookStore.Services
             };
 
             return result;
+        }
+
+        public async Task<BookDetailDto> GetByIdAsync(int id)
+        {
+            var book = await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync(b => b.Id == id) ?? throw new NotFoundException($"Book with ID {id} not found.");
+
+            return new BookDetailDto
+            {
+                Id = book.Id,
+                Isbn = book.Isbn,
+                Title = book.Title,
+                Description = book.Description,
+                ListPrice = book.ListPrice,
+                Discount = book.Discount,
+                Stock = book.Stock,
+                PublicationDate = book.PublicationDate,
+                ImagePath = book.ImagePath,
+                AuthorId = book.Author.Id,
+                AuthorName = book.Author.Name,
+                PublisherId = book.Publisher.Id,
+                PublisherName = book.Publisher.Name
+            };
         }
     }
 }

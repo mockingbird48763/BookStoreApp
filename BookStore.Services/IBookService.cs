@@ -11,6 +11,7 @@ namespace BookStore.Services
 {
     public interface IBookService
     {
-        public Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters);
+        Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters);
+        Task<BookDetailDto> GetByIdAsync(int id);
     }
 }

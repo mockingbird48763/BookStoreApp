@@ -1,7 +1,9 @@
 ﻿using BookStore.DTO.Request;
+using BookStore.DTO.Response;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.API.Controllers
 {
@@ -24,18 +26,15 @@ namespace BookStore.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetBooks([FromQuery] BookQueryParameters bookQueryParameters)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-            }
-            try
-            {
-                return Ok(await _bookService.GetBooksAsync(bookQueryParameters));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            return Ok(await _bookService.GetBooksAsync(bookQueryParameters));
+        }
+
+        [HttpGet("{id:int}")]
+        [AllowAnonymous]
+        public async Task<ActionResult> GetBookById([FromRoute] int id)
+        {
+            var book = await _bookService.GetByIdAsync(id);
+            return Ok(book);
         }
     }
 }
