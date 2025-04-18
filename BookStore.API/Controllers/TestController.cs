@@ -1,5 +1,7 @@
 using BookStore.DTO.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookStore.API.Controllers
 {
@@ -11,23 +13,56 @@ namespace BookStore.API.Controllers
     public class TestController : ControllerBase
     {
         /// <summary>
-        /// 這是一個 GET API
+        /// Guest 權限測試
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult<string> Get()
+        [AllowAnonymous]
+        public ActionResult<string> ForGuest()
         {
-            return "Hello";
+            return "Hello, Guest";
         }
 
         /// <summary>
-        /// 這是一個問好的 API
+        /// User 權限測試
         /// </summary>
         /// <returns></returns>
-        [HttpPost("hello")]
-        public ActionResult<string> Hello([FromBody] TestRequest request)
+        [HttpGet("user")]
+        [Authorize(Roles = "User")]
+        public IActionResult ForUser()
         {
-            return "Hello, " + request.Name;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            return Ok(new { userId, email, role });
+        }
+
+        /// <summary>
+        /// Admin 權限測試
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult ForAdmin()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            return Ok(new { userId, email, role });
+        }
+
+        /// <summary>
+        /// 不限角色的登入用戶權限測試
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("authenticatedUsers")]
+        [Authorize]
+        public IActionResult ForAuthenticatedUsers()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            return Ok(new { userId, email, role });
         }
     }
 }
