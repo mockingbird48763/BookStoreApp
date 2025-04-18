@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# 忽略所有 wwwroot/images 下的檔案
+wwwroot/images/*
+
+# 但不要忽略 wwwroot/images/example 資料夾內的內容
+!wwwroot/images/example/
+!wwwroot/images/example/**
+
 # User-specific files
 *.rsuser
 *.suo

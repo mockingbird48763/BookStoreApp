@@ -13,6 +13,9 @@ namespace BookStore.Data
     {
         public DbSet<Member> Members { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Publisher> Publishers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
@@ -23,6 +26,10 @@ namespace BookStore.Data
 
             modelBuilder.Entity<Member>()
                 .HasIndex(m => m.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Book>()
+                .HasIndex(m => m.Isbn)
                 .IsUnique();
 
             // modelBuilder.Entity<Role>().HasData(

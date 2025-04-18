@@ -130,6 +130,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();  // 確保啟用認證
 app.UseAuthorization();   // 確保啟用授權
+app.UseStaticFiles(); // 確保已經啟用靜態檔案服務
 
 app.MapControllers();
 
