@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BookStore.Core.Extensions;
 
 namespace BookStore.Services
 {
@@ -18,9 +19,17 @@ namespace BookStore.Services
 
         public async Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters)
         {
-            var query = _context.Books.AsQueryable();
             var page = bookQueryParameters.Page;
             var pageSize = bookQueryParameters.PageSize;
+
+            var query = _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .AsQueryable();
+
+            query = query.FilterByAuthor(bookQueryParameters.AuthorId)
+                            .FilterByPublisher(bookQueryParameters.PublisherId)
+                            .FilterByKeyword(bookQueryParameters.Keyword);
 
             var totalCount = await query.CountAsync();
             // var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
