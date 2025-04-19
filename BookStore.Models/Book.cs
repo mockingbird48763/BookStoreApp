@@ -28,7 +28,7 @@ namespace BookStore.Models
         [Range(0, int.MaxValue, ErrorMessage = "List price must be greater than 0.")]
         public required decimal ListPrice { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Discount is required.")]
         [Range(0, 100, ErrorMessage = "Discount must be between 0 and 100.")]
         public required short Discount { get; set; }
 

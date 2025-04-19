@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MimeKit" Version="4.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BookStore.DTO\BookStore.DTO.csproj" />
     <ProjectReference Include="..\BookStore.Repositories\BookStore.Repositories.csproj" />
     <ProjectReference Include="..\Core\BookStore.Core.csproj" />

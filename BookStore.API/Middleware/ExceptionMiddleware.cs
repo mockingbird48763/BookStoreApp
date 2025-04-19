@@ -14,9 +14,21 @@ namespace BookStore.API.Middleware
             {
                 await _next(context);
             }
+            catch (InvalidImageFormatException ex)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
+            }
             catch (NotFoundException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
+            }
+            catch (IOException ex)
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
             }

@@ -10,5 +10,6 @@ namespace BookStore.Services
     public interface IAuthService
     {
         Task<string> LoginAsync(String email, String password);
+        public void Move() { Console.WriteLine("Animal moves"); }
     }
 }
