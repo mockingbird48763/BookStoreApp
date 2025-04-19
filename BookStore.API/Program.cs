@@ -1,26 +1,44 @@
 using BookStore.API.Middleware;
 using BookStore.Core.Settings;
+using BookStore.Core.Strategies;
 using BookStore.Data;
+using BookStore.DTO.Request;
+using BookStore.DTO.Validators;
 using BookStore.Services;
+using BookStore.Services.FileStorageStrategies;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// 依賴注入
+#region DependencyInjection
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
+builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IImageStorageStrategy, CloudImageStorageStrategy>();
+}
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+#endregion
+
+#region FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookRequestValidator>();
+#endregion
 
 #region Swagger
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -30,7 +48,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "一個簡單的 API 用於管理書店的庫存、顧客與訂單"
     });
-
 
     // 讀取當前專案的 XML 註解
     var baseXmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -51,7 +68,6 @@ builder.Services.AddSwaggerGen(options =>
 
     // 對 action 進行名稱排序
     options.OrderActionsBy(o => o.RelativePath);
-
     #region Configure JWT Token Authorization
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
