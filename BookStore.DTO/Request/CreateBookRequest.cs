@@ -11,7 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BookStore.DTO.Request
 {
-    public class CreateBookRequest : IValidatableObject
+    public class CreateBookRequest
     {
         /// <example>123-4-567890-000</example>
         [Required(ErrorMessage = "ISBN is required.")]
@@ -63,50 +63,5 @@ namespace BookStore.DTO.Request
         /// </summary>
         [Required(ErrorMessage = "UploadedImage is required.")]
         public required IFormFile UploadedImage { get; set; }
-
-        // TODO: 抽離驗證邏輯
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            // 檢查圖片格式
-            var formatErrors = ValidateImageFormat();
-            foreach (var error in formatErrors)
-            {
-                yield return error;
-            }
-
-            // 檢查檔案大小
-            var sizeErrors = ValidateImageSize();
-            foreach (var error in sizeErrors)
-            {
-                yield return error;
-            }
-        }
-
-        private IEnumerable<ValidationResult> ValidateImageFormat()
-        {
-            // 支援的 MIME 類型
-            var allowedMimeTypes = new HashSet<string>
-            {
-                "image/jpeg",
-                "image/png"
-            };
-
-            // 取得檔案的 MIME 類型
-            var fileMimeType = UploadedImage.ContentType.ToLower();
-
-            // 檢查檔案 MIME 類型是否在允許的範圍內
-            if (!allowedMimeTypes.Contains(fileMimeType))
-            {
-                yield return new ValidationResult($"The file MIME type {fileMimeType} is not a valid image format.", [nameof(UploadedImage)]);
-            }
-        }
-
-        private IEnumerable<ValidationResult> ValidateImageSize()
-        {
-            if (UploadedImage.Length > 2 * 1024 * 1024)  // 2MB
-            {
-                yield return new ValidationResult("The image size must not exceed 2MB.", [nameof(UploadedImage)]);
-            }
-        }
     }
 }

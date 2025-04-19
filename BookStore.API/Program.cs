@@ -2,14 +2,19 @@ using BookStore.API.Middleware;
 using BookStore.Core.Settings;
 using BookStore.Core.Strategies;
 using BookStore.Data;
+using BookStore.DTO.Request;
+using BookStore.DTO.Validators;
 using BookStore.Services;
 using BookStore.Services.FileStorageStrategies;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +30,11 @@ if (!builder.Environment.IsDevelopment())
     builder.Services.AddScoped<IImageStorageStrategy, CloudImageStorageStrategy>();
 }
 builder.Services.AddControllers();
+#endregion
+
+#region FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookRequestValidator>();
 #endregion
 
 #region Swagger
