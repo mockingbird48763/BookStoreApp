@@ -31,7 +31,7 @@ namespace BookStore.API.Controllers
         }
 
         /// <summary>
-        /// 根據書籍 ID 獲取單一本書的詳細資料
+        /// 獲取書籍詳細資料
         /// </summary>
         /// <param name="id">書籍的唯一識別碼</param>
         /// <returns>書籍資料或錯誤訊息</returns>
@@ -48,7 +48,7 @@ namespace BookStore.API.Controllers
 
         // TODO: 添加權限
         /// <summary>
-        /// 新增一本書籍
+        /// 新增書籍
         /// </summary>
         /// <param name="request">書籍資料</param>
         /// <returns>新增成功的書籍</returns>
@@ -59,6 +59,22 @@ namespace BookStore.API.Controllers
         {
             var bookId = await _bookService.CreateBookAsync(request);
             return StatusCode(201, new { id = bookId });
+        }
+
+        // TODO: 添加權限
+        /// <summary>
+        /// 修改書籍詳細資料
+        /// </summary>
+        /// <param name="id">書籍的唯一識別碼</param>
+        /// <param name="updateRequest">書籍資料</param>
+        /// <returns></returns>
+        /// <response code="204">修改成功</response>
+        /// <response code="400">資料格式錯誤</response>
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> UpdateBook([FromRoute] int id, [FromForm] UpdateBookRequest updateRequest)
+        {
+            await _bookService.UpdateBookAsync(id, updateRequest);
+            return NoContent();
         }
     }
 }

@@ -12,13 +12,15 @@ using System.Threading.Tasks;
 using BookStore.Core.Extensions;
 using BookStore.Core.Exceptions;
 using BookStore.Models;
+using AutoMapper;
 
 namespace BookStore.Services
 {
-    public class BookService(ApplicationDbContext context, IImageStorageService imageStorageService) : IBookService
+    public class BookService(ApplicationDbContext context, IMapper mapper, IImageStorageService imageStorageService) : IBookService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IImageStorageService _imageStorageService = imageStorageService;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters)
         {
@@ -85,27 +87,24 @@ namespace BookStore.Services
             };
         }
 
-        public async Task<int> CreateBookAsync(CreateBookRequest request)
+        public async Task<int> CreateBookAsync(CreateBookRequest createRequest)
         {
-            var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == request.AuthorId)
-                ?? throw new NotFoundException("Author does not exist.");
-            var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == request.PublisherId)
-                ?? throw new NotFoundException("Publisher does not exist.");
-            if (await _context.Books.AnyAsync(b => b.Isbn == request.Isbn))
-                throw new NotFoundException("ISBN already exists.");
+            var author = await GetAuthorByIdAsync(createRequest.AuthorId);
+            var publisher = await GetPublisherByIdAsync(createRequest.PublisherId);
+            await EnsureIsbnUniqueAsync(createRequest.Isbn);
 
-            String imagePath = await _imageStorageService.UploadAsync(request.UploadedImage);
+            String imagePath = await _imageStorageService.UploadAsync(createRequest.UploadedImage);
 
             var book = new Book
             {
-                Isbn = request.Isbn,
-                Title = request.Title,
-                Description = request.Description,
-                ListPrice = request.ListPrice,
-                Discount = request.Discount,
-                PublicationDate = request.PublicationDate,
+                Isbn = createRequest.Isbn,
+                Title = createRequest.Title,
+                Description = createRequest.Description,
+                ListPrice = createRequest.ListPrice,
+                Discount = createRequest.Discount,
+                PublicationDate = createRequest.PublicationDate,
                 ImagePath = imagePath,
-                Stock = request.Stock,
+                Stock = createRequest.Stock,
                 Author = author,
                 Publisher = publisher,
             };
@@ -113,6 +112,65 @@ namespace BookStore.Services
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return book.Id;
+        }
+
+        public async Task UpdateBookAsync(int id, UpdateBookRequest updateRequest)
+        {
+            var book = await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync(b => b.Id == id) ?? throw new NotFoundException($"Book with ID {id} not found.");
+
+            var author = await GetAuthorByIdAsync(updateRequest.AuthorId);
+            var publisher = await GetPublisherByIdAsync(updateRequest.PublisherId);
+            if (!string.Equals(updateRequest.Isbn, book.Isbn))
+            {
+                await EnsureIsbnUniqueAsync(updateRequest.Isbn);
+            }
+
+            String imagePath = String.Empty;
+            if (updateRequest.UploadedImage != null)
+            {
+                imagePath = await _imageStorageService.UploadAsync(updateRequest.UploadedImage);
+            }
+
+            _mapper.Map(updateRequest, book);
+            book.Author = author ?? book.Author;
+            book.Publisher = publisher ?? book.Publisher;
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                book.ImagePath = imagePath;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Author> GetAuthorByIdAsync(int authorId)
+        {
+            var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == authorId);
+            if (author == null)
+            {
+                throw new NotFoundException("Author does not exist.");
+            }
+            return author;
+        }
+
+        public async Task<Publisher> GetPublisherByIdAsync(int publisherId)
+        {
+            var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == publisherId);
+            if (publisher == null)
+            {
+                throw new NotFoundException("Publisher does not exist.");
+            }
+            return publisher;
+        }
+
+        public async Task EnsureIsbnUniqueAsync(string isbn)
+        {
+            if (await _context.Books.AnyAsync(b => b.Isbn == isbn))
+            {
+                throw new NotFoundException("ISBN already exists.");
+            }
         }
     }
 }

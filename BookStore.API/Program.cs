@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 using FluentValidation.AspNetCore;
+using BookStore.DTO.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddControllers();
 #region FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateBookRequestValidator>();
+#endregion
+
+#region AutoMapper
+builder.Services.AddAutoMapper(typeof(BookProfile));
 #endregion
 
 #region Swagger
