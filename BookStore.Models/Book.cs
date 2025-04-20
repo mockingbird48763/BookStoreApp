@@ -40,7 +40,7 @@ namespace BookStore.Models
         public required DateOnly PublicationDate { get; set; }
 
         [Required(ErrorMessage = "Image path is required.")]
-        [StringLength(50, ErrorMessage = "ImagePath cannot be longer than 30 characters.")]
+        [StringLength(50, ErrorMessage = "ImagePath cannot be longer than 50 characters.")]
         public required string ImagePath { get; set; }
 
         [Required(ErrorMessage = "Author is required.")]

@@ -145,11 +145,13 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureDeleted(); // 每次啟動清空
-    context.Database.EnsureCreated(); // 重新建表
-    await SeedData.SeedAsync(app.Services); // 填充初始資料
+
+    // dotnet run --seed
+    if (args.Contains("--seed"))
+    {
+        await InitializeDatabaseAsync(app.Services);
+        Console.WriteLine("Database initialization complete.");
+    }
 }
 
 app.UseAuthentication();  // 確保啟用認證
@@ -160,3 +162,13 @@ app.UseMiddleware<ExceptionMiddleware>(); // 全局異常處理器
 app.MapControllers();
 
 app.Run();
+
+static async Task InitializeDatabaseAsync(IServiceProvider services)
+{
+    using var scope = services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    context.Database.EnsureDeleted();  // 每次啟動清空
+    context.Database.EnsureCreated();  // 重新建表
+    await SeedData.SeedAsync(services); // 填充初始資料
+}

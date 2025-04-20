@@ -16,6 +16,8 @@ namespace BookStore.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Publisher> Publishers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
@@ -30,6 +32,10 @@ namespace BookStore.Data
 
             modelBuilder.Entity<Book>()
                 .HasIndex(m => m.Isbn)
+                .IsUnique();
+
+            modelBuilder.Entity<Order>()
+                .HasIndex(m => m.OrderNubmer)
                 .IsUnique();
 
             // modelBuilder.Entity<Role>().HasData(
