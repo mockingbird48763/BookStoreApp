@@ -15,5 +15,6 @@ namespace BookStore.Services
         Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters);
         Task<BookDetailDto> GetByIdAsync(int id);
         Task UpdateBookAsync(int id, UpdateBookRequest updateRequest);
+        Task DeleteBookAsync(int id);
     }
 }
