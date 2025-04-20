@@ -74,7 +74,7 @@ namespace BookStore.API.Controllers
         public async Task<IActionResult> UpdateBook([FromRoute] int id, [FromForm] UpdateBookRequest updateRequest)
         {
             await _bookService.UpdateBookAsync(id, updateRequest);
-            return StatusCode(201, new { id });
+            return NoContent();
         }
     }
 }
