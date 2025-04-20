@@ -54,26 +54,47 @@ namespace BookStore.API.Controllers
         /// <returns>新增成功的書籍</returns>
         /// <response code="201">新增成功</response>
         /// <response code="400">資料格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook([FromForm] CreateBookRequest request)
         {
             var bookId = await _bookService.CreateBookAsync(request);
             return StatusCode(201, new { id = bookId });
         }
 
-        // TODO: 添加權限
         /// <summary>
         /// 修改書籍詳細資料
         /// </summary>
         /// <param name="id">書籍的唯一識別碼</param>
         /// <param name="updateRequest">書籍資料</param>
-        /// <returns></returns>
         /// <response code="204">修改成功</response>
         /// <response code="400">資料格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        /// <response code="404">找不到指定的書籍</response>
         [HttpPatch("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBook([FromRoute] int id, [FromForm] UpdateBookRequest updateRequest)
         {
             await _bookService.UpdateBookAsync(id, updateRequest);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// 刪除書籍
+        /// </summary>
+        /// <param name="id">書籍的唯一識別碼</param>
+        /// <returns></returns>
+        /// <response code="204">刪除成功</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBook([FromRoute] int id)
+        {
+            await _bookService.DeleteBookAsync(id);
             return NoContent();
         }
     }

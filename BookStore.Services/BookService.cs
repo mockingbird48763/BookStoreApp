@@ -145,6 +145,13 @@ namespace BookStore.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteBookAsync(int id)
+        {
+            await _context.Books
+                .Where(b => b.Id == id)
+                .ExecuteDeleteAsync();
+        }
+
         public async Task<Author> GetAuthorByIdAsync(int authorId)
         {
             var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == authorId);
@@ -172,5 +179,7 @@ namespace BookStore.Services
                 throw new NotFoundException("ISBN already exists.");
             }
         }
+
+
     }
 }
