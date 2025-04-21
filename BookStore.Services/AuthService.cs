@@ -32,14 +32,13 @@ namespace BookStore.Services
 
             var claims = new List<Claim>
             {
-                // new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email),
             };
 
             foreach (var role in user.Roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+                claims.Add(new Claim(ClaimTypes.Role, role.Name.ToString()));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));

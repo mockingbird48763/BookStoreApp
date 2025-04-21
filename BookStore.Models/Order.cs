@@ -14,7 +14,7 @@ namespace BookStore.Models
         [Required(ErrorMessage = "OrderNubmer is required.")]
         [StringLength(20, MinimumLength = 20, ErrorMessage = "OrderNubmer must be exactly 20 characters.")]
         [RegularExpression(@"^\d{8}_\d{6}_\d{4}_[a-z0-9]{4}$", ErrorMessage = "OrderNubmer must be in the format '20000000_000000_0000'.")]
-        public required string OrderNubmer { get; set; }
+        public required string OrderNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Total Price must be greater than 1.")]
         public Decimal TotalPrice { get; set; }

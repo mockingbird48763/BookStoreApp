@@ -26,6 +26,10 @@ namespace BookStore.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Role>()
+                .Property(r => r.Name)
+                .HasConversion<string>();
+
             modelBuilder.Entity<Member>()
                 .HasIndex(m => m.Email)
                 .IsUnique();
@@ -35,7 +39,7 @@ namespace BookStore.Data
                 .IsUnique();
 
             modelBuilder.Entity<Order>()
-                .HasIndex(m => m.OrderNubmer)
+                .HasIndex(m => m.OrderNumber)
                 .IsUnique();
 
             // modelBuilder.Entity<Role>().HasData(

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.DTO.Response
 {
-    public class AdminOrderSummaryDto
+    public class OrderSummaryDto
     {
         public int Id { get; set; }
         public string OrderNumber { get; set; } = "";
@@ -17,5 +17,6 @@ namespace BookStore.DTO.Response
         public PaymentMethod PaymentMethod { get; set; }
         public ShippingMethod ShippingMethod { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int MemberId { get; set; }
     }
 }

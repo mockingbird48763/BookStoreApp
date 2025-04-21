@@ -1,4 +1,5 @@
-﻿using BookStore.Models;
+﻿using BookStore.Core.Exceptions;
+using BookStore.Models;
 using BookStore.Models.Enums;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,31 @@ namespace BookStore.Core.Extensions
             }
             return query;
         }
+
+        public static IQueryable<Order> FilterByRoleAndMemberId(this IQueryable<Order> query, string roleName, int? memberId)
+        {
+            if (roleName == RoleType.User.ToString())
+            {
+                if (memberId.HasValue)
+                {
+                    query = query.Where(o => o.Member.Id == memberId.Value);
+                }
+                else
+                {
+                    throw new NotFoundException("MemberId is required for User role.");
+                }
+            }
+            else if (roleName == RoleType.Admin.ToString())
+            {
+                // Admin 不需要額外過濾，可以查詢所有訂單，或者篩選特定會員的訂單
+                if (memberId.HasValue)
+                {
+                    query = query.Where(o => o.Member.Id == memberId.Value);
+                }
+            }
+            return query;
+        }
+        
 
         public static IQueryable<Order> FilterByOrderStatus(this IQueryable<Order> query, OrderStatus? orderStatus)
         {

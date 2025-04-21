@@ -11,7 +11,8 @@ namespace BookStore.Services
 {
     public interface IOrderService
     {
-        Task<PaginatedResult<AdminOrderSummaryDto>> GetAllOrdersAsync(OrderQueryParameters orderQueryParameters);
-        Task<PaginatedResult<Order>> GetOrdersByMemberIdAsync(int id);
+        Task<PaginatedResult<OrderSummaryDto>> GetOrdersAsync(OrderQueryParameters orderQueryParameters);
+
+        Task<OrderDetailDto> GetOrderDetailAsync(OrderDetailRequest orderDetailRequest);
     }
 }

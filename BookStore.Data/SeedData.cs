@@ -69,8 +69,8 @@ namespace BookStore.Data
         {
             var roles = new List<Role>
             {
-                new() { Name = RoleNames.Admin },
-                new() { Name = RoleNames.User }
+                new() { Name = RoleType.Admin },
+                new() { Name = RoleType.User }
             };
             context.Roles.AddRange(roles);
             return roles;
@@ -464,7 +464,7 @@ namespace BookStore.Data
             DateTime createdAt = GenerateRandomDateBefore(orderSeedDate ?? DateTime.UtcNow);
             return new Order
             {
-                OrderNubmer = GenerateOrderNumber(createdAt),
+                OrderNumber = GenerateOrderNumber(createdAt),
                 TotalPrice = orderItems.Sum(item => item.UnitPrice * item.Quantity),
                 ShippingAddress = GenerateRandomAddress(),
                 OrderStatus = faker.PickRandom<OrderStatus>(),
@@ -507,10 +507,5 @@ namespace BookStore.Data
             };
             return faker.PickRandom(shippingNotes);
         }
-    }
-    static class RoleNames
-    {
-        public const string Admin = "Admin";
-        public const string User = "User";
     }
 }

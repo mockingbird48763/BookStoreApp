@@ -1,4 +1,5 @@
 ﻿using BookStore.Models.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -34,5 +35,9 @@ namespace BookStore.DTO.Request
         public DateOnly? StartDate { get; set; } = DateOnly.FromDateTime(new DateTime(2000, 1, 1));
 
         public DateOnly? EndDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+
+        [SwaggerIgnore]
+        public String RoleName { get; set; } = String.Empty;
+
     }
 }
