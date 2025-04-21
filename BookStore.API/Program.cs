@@ -23,6 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 
