@@ -1,4 +1,5 @@
 using BookStore.DTO.Request;
+using BookStore.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -61,8 +62,16 @@ namespace BookStore.API.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var email = User.FindFirstValue(ClaimTypes.Email);
-            var role = User.FindFirstValue(ClaimTypes.Role);
-            return Ok(new { userId, email, role });
+
+            User.IsInRole("Admin");
+            User.IsInRole("Manager");
+            return Ok(new { 
+                userId, 
+                email, 
+                roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(), // ["Admin", "User"]
+                isAdmin = User.IsInRole(RoleType.Admin.ToString()),
+                isUser = User.IsInRole(RoleType.User.ToString()),
+            });
         }
 
         // 設定檔案儲存路徑

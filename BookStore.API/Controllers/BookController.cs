@@ -17,6 +17,8 @@ namespace BookStore.API.Controllers
     {
         private readonly IBookService _bookService = bookService;
 
+        // TODO: 改為軟刪除
+        // TODO: 更改 api 路徑
         /// <summary>
         /// 獲取書籍列表
         /// </summary>

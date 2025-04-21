@@ -1,4 +1,5 @@
 ﻿using BookStore.Models;
+using BookStore.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,9 +10,7 @@ public class Role
 {
     public int Id { get; set; }
 
-    [Required]
-    [StringLength(50)]
-    public required string Name { get; set; }
+    public required RoleType Name { get; set; }
 
     public ICollection<Member> Members { get; set; } = new List<Member>();
 }
