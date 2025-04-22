@@ -17,12 +17,10 @@ namespace BookStore.API.Middleware
             catch (InvalidImageFormatException ex)
             {
                 await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
-
             }
             catch (NotFoundException ex)
             {
                 await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
-
             }
             catch (IOException ex)
             {

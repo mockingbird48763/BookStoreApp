@@ -16,5 +16,7 @@ namespace BookStore.Services
         Task<OrderDetailDto> GetOrderDetailAsync(OrderDetailRequest orderDetailRequest);
 
         Task<int> CreateOrderAsync(CreateOrderRequest createOrderRequest);
+
+        Task UpdateOrderAsync(int id, UpdateOrderRequest updateOrderRequest);
     }
 }

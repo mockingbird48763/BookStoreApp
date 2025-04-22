@@ -23,13 +23,16 @@ namespace BookStore.DTO.Request
         // 合法參數
         // ?OrderStatus=0
         // ?OrderStatus=Pending (無視大小寫)
-        // 枚舉內建攔截機制
+        [EnumDataType(typeof(OrderStatus))]
         public OrderStatus? OrderStatus { get; set; }
 
+        [EnumDataType(typeof(PaymentStatus))]
         public PaymentStatus? PaymentStatus { get; set; }
 
+        [EnumDataType(typeof(PaymentMethod))]
         public PaymentMethod? PaymentMethod { get; set; }
 
+        [EnumDataType(typeof(ShippingMethod))]
         public ShippingMethod? ShippingMethod { get; set; }
 
         public DateOnly? StartDate { get; set; } = DateOnly.FromDateTime(new DateTime(2000, 1, 1));

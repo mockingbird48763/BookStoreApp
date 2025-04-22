@@ -67,18 +67,38 @@ namespace BookStore.API.Controllers
         /// <summary>
         /// 創建訂單
         /// </summary>
-        /// <returns>請求成功或失敗的訊息</returns>
-        /// <response code="201">請求成功</response>
+        /// <returns>創建成功或失敗的訊息</returns>
+        /// <response code="201">創建成功</response>
         /// <response code="400">請求格式錯誤</response>
         /// <response code="401">未經身份驗證</response>
         /// <response code="403">授權不足</response>
+        /// <response code="404">查無此商品</response>
+        /// <response code="409">庫存不足</response>
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(CreateOrderRequest createOrderRequest) {
-            createOrderRequest.MemberId = 1;
+        [Authorize(Roles = "User, Admin")]
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest createOrderRequest) {
+            createOrderRequest.MemberId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var id = await _orderService.CreateOrderAsync(createOrderRequest);
 
             return StatusCode(201, new { Id = id });
+        }
+
+        /// <summary>
+        /// 修改訂單狀態
+        /// </summary>
+        /// <returns>修改成功或失敗的訊息</returns>
+        /// <response code="204">修改成功</response>
+        /// <response code="400">請求格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        /// <response code="404">查無此訂單</response>
+        [HttpPatch("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] UpdateOrderRequest updateOrderRequest)
+        {
+            await _orderService.UpdateOrderAsync(id, updateOrderRequest);
+            return NoContent();
         }
     }
 }
