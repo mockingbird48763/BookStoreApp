@@ -165,6 +165,19 @@ namespace BookStore.Services
             }
         }
 
+        public async Task UpdateOrderAsync(int id, UpdateOrderRequest updateOrderRequest)
+        {
+            var order = await _context.Orders.FindAsync(id) ?? throw new NotFoundException($"Order with ID {id} was not found.");
+
+            if (updateOrderRequest.OrderStatus.HasValue)
+                order.OrderStatus = updateOrderRequest.OrderStatus.Value;
+
+            if (updateOrderRequest.PaymentStatus.HasValue)
+                order.PaymentStatus = updateOrderRequest.PaymentStatus.Value;
+
+            await _context.SaveChangesAsync();
+        }
+
         private static OrderDetailDto ToOrderDetailDto(Order o)
         {
             return new OrderDetailDto
@@ -210,7 +223,5 @@ namespace BookStore.Services
             var random = new Random();
             return new string([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
         }
-
-
     }
 }
