@@ -17,15 +17,18 @@ namespace BookStore.Models
         public required string OrderNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Total Price must be greater than 1.")]
-        public Decimal TotalPrice { get; set; }
+        public required Decimal TotalPrice { get; set; }
 
         [StringLength(150, ErrorMessage = "ShippingAddress cannot be longer than 150 characters.")]
         public required String ShippingAddress { get; set; }
 
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
+
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
-        public PaymentMethod PaymentMethod { get; set; }
-        public ShippingMethod ShippingMethod { get; set; }
+
+        public required PaymentMethod PaymentMethod { get; set; }
+
+        public required ShippingMethod ShippingMethod { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -34,6 +37,6 @@ namespace BookStore.Models
 
         public required Member Member { get; set; }
 
-        public ICollection<OrderItem> OrderItems { get; set; } = [];
+        public required ICollection<OrderItem> OrderItems { get; set; } = [];
     }
 }

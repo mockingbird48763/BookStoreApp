@@ -48,5 +48,8 @@ namespace BookStore.Models
 
         [Required(ErrorMessage = "Publisher is required.")]
         public required Publisher Publisher { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; } = [];
     }
 }

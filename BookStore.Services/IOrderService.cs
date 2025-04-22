@@ -14,5 +14,7 @@ namespace BookStore.Services
         Task<PaginatedResult<OrderSummaryDto>> GetOrdersAsync(OrderQueryParameters orderQueryParameters);
 
         Task<OrderDetailDto> GetOrderDetailAsync(OrderDetailRequest orderDetailRequest);
+
+        Task<int> CreateOrderAsync(CreateOrderRequest createOrderRequest);
     }
 }
