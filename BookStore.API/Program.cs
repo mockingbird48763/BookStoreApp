@@ -120,7 +120,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.RequireHttpsMetadata = false; // 是否要求 HTTPS (視情況設定)
         options.SaveToken = true; // 儲存 Token
-        var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>(); // 使用 DI 容器來取得 JwtSettings 配置
+        var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? throw new InvalidOperationException("JWT settings not configured."); // 使用 DI 容器來取得 JwtSettings 配置
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

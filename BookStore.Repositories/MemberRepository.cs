@@ -18,7 +18,7 @@ namespace BookStore.Repositories
             _context = context;
         }
 
-        public async Task<Member> GetByEmailAsync(string email)
+        public async Task<Member?> GetByEmailAsync(string email)
         {
             return await _context.Members.FirstOrDefaultAsync(m => m.Email == email);
         }

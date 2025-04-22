@@ -2,6 +2,7 @@
 using BookStore.Models.Enums;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -61,6 +62,23 @@ namespace BookStore.API.Controllers
             };
             
             return Ok(await _orderService.GetOrderDetailAsync(orderDetailRequest));
+        }
+
+        /// <summary>
+        /// 創建訂單
+        /// </summary>
+        /// <returns>請求成功或失敗的訊息</returns>
+        /// <response code="201">請求成功</response>
+        /// <response code="400">請求格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder(CreateOrderRequest createOrderRequest) {
+            createOrderRequest.MemberId = 1;
+
+            var id = await _orderService.CreateOrderAsync(createOrderRequest);
+
+            return StatusCode(201, new { Id = id });
         }
     }
 }

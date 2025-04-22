@@ -16,21 +16,21 @@ namespace BookStore.API.Middleware
             }
             catch (InvalidImageFormatException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
+                await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
+
             }
             catch (NotFoundException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
+                await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
+
             }
             catch (IOException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new { errors = new[] { ex.Message } });
+                await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
+            }
+            catch (InsufficientStockException ex)
+            {
+                await HandleExceptionAsync(context, StatusCodes.Status409Conflict, ex.Message);
             }
             catch (Exception ex)
             {
@@ -39,6 +39,13 @@ namespace BookStore.API.Middleware
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsJsonAsync(new { errors = defaultError });
             }
+        }
+
+        private async Task HandleExceptionAsync(HttpContext context, int statusCode, string message)
+        {
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new { errors = new[] { message } });
         }
     }
 }

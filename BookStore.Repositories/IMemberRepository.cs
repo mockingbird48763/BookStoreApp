@@ -9,7 +9,7 @@ namespace BookStore.Repositories
 {
     public interface IMemberRepository
     {
-        Task<Member> GetByEmailAsync(string email);
+        Task<Member?> GetByEmailAsync(string email);
         Task AddAsync(Member member);
     }
 }

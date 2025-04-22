@@ -1,4 +1,5 @@
-﻿using BookStore.Core.Exceptions;
+﻿using Bogus;
+using BookStore.Core.Exceptions;
 using BookStore.Core.Extensions;
 using BookStore.Data;
 using BookStore.DTO.Request;
@@ -87,6 +88,83 @@ namespace BookStore.Services
             return ToOrderDetailDto(order);
         }
 
+        public async Task<int> CreateOrderAsync(CreateOrderRequest createOrderRequest)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var bookIds = createOrderRequest.OrderItems.Select(x => x.BookId).ToList();
+
+            // Dictionary<int, Book>
+            var books = await _context.Books
+                .Where(b => bookIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id);
+
+            // 驗證庫存是否足夠
+            foreach (var item in createOrderRequest.OrderItems)
+            {
+                if (!books.TryGetValue(item.BookId, out Book? value))
+                    throw new NotFoundException($"Book not found: {item.BookId}");
+
+                if (value.Stock < item.Quantity)
+                    throw new InsufficientStockException($"Insufficient stock for book: {item.BookId}");
+            }
+
+            var memberId = createOrderRequest.MemberId;
+            var member = await _context.Members
+                .FirstOrDefaultAsync(m => m.Id == memberId)
+                ?? throw new NotFoundException($"Member with ID {memberId} not found.");
+
+            var orderItems = createOrderRequest.OrderItems
+                .Select(item =>
+                {
+                    var book = books[item.BookId];
+                    // 整數除法的截斷，結果是 0，不是 0.2
+                    // int result = discount / 100;
+                    var unitPrice = Math.Round(book.ListPrice * (book.Discount / 100m), 0);
+
+                    return new OrderItem
+                    {
+                        Book = book,
+                        Quantity = item.Quantity,
+                        UnitPrice = unitPrice
+                    };
+                }).ToList();
+
+            // 建立訂單
+            var order = new Order
+            {
+                CreatedAt = DateTime.UtcNow,
+                OrderNumber = GenerateOrderNumber(DateTime.UtcNow),
+                Member = member,
+                ShippingAddress = createOrderRequest.ShippingAddress,
+                TotalPrice = orderItems.Sum(item => item.Quantity * item.UnitPrice),
+                PaymentMethod = createOrderRequest.PaymentMethod,
+                ShippingMethod = createOrderRequest.ShippingMethod,
+                ShippingNote = createOrderRequest.ShippingNote ?? string.Empty,
+                OrderItems = orderItems
+            };
+
+            _context.Orders.Add(order);
+
+            // 扣除庫存
+            foreach (var item in createOrderRequest.OrderItems)
+            {
+                books[item.BookId].Stock -= item.Quantity;
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync(); // 此時會自動檢查 RowVersion 是否有改變
+                await transaction.CommitAsync();
+                return order.Id;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync();
+                throw new InsufficientStockException("訂單失敗，書籍庫存已變更，請重新下單。");
+            }
+        }
+
         private static OrderDetailDto ToOrderDetailDto(Order o)
         {
             return new OrderDetailDto
@@ -119,5 +197,20 @@ namespace BookStore.Services
                 BookName = oi.Book.Title,
             };
         }
+
+        private static string GenerateOrderNumber(DateTime date)
+        {
+            var dataFormat = date.ToString("yyyyMMdd_HHmmss");
+            var orderNumber = $"{dataFormat}_{GenerateRandomCode()}";
+            return orderNumber;
+        }
+
+        private static string GenerateRandomCode(int length = 4) {
+            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
+        }
+
+
     }
 }
