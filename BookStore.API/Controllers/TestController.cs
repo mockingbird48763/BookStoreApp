@@ -2,6 +2,8 @@ using BookStore.DTO.Request;
 using BookStore.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 
 namespace BookStore.API.Controllers
@@ -114,6 +116,47 @@ namespace BookStore.API.Controllers
             }
 
             return Ok(new { message = "上傳成功", fileName = $"{datePart}_{randomStr}{fileExtension}" });
+        }
+
+        [HttpPost("download-report1")]
+        [AllowAnonymous]
+        public IActionResult GenerateReportA()
+        {
+            string data = "ID,Name,Amount\n1,John Doe,100\n2,Jane Smith,150\n3,Bob Johnson,200";
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(data);
+
+            string fileName = "report.csv";
+            return File(fileBytes, "text/csv", fileName);  // 使用 File 方法直接返回檔案
+        }
+
+        [HttpPost("download-report2")]
+        [AllowAnonymous]
+        public IActionResult GenerateReportB()
+        {
+            var memoryStream = new MemoryStream();
+            using (var writer = new StreamWriter(memoryStream, leaveOpen: false))
+            {
+                // 固定的常量報表資料
+                string[] reportData = new string[]
+                {
+                    "OrderID,CustomerName,Amount",
+                    "1,John Doe,100.00",
+                    "2,Jane Smith,200.50",
+                    "3,Jim Brown,150.75"
+                };
+
+                // 寫入資料到 CSV 格式
+                foreach (var line in reportData)
+                {
+                    writer.WriteLine(line);
+                }
+
+                writer.Flush();
+            }
+
+            // memoryStream.Position = 0; // 重置 MemoryStream 的位置以便讀取，配合 leaveOpen: false
+            Response.Headers.Append("Content-Disposition", "attachment; filename=report.csv");
+            return new FileStreamResult(memoryStream, "text/csv");
         }
     }
 }

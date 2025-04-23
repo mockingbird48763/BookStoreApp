@@ -18,5 +18,7 @@ namespace BookStore.Services
         Task<int> CreateOrderAsync(CreateOrderRequest createOrderRequest);
 
         Task UpdateOrderAsync(int id, UpdateOrderRequest updateOrderRequest);
+
+        Task<FileStream> GenerateOrderReportAsync(OrderQueryParameters orderQueryParameters);
     }
 }

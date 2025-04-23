@@ -100,5 +100,28 @@ namespace BookStore.API.Controllers
             await _orderService.UpdateOrderAsync(id, updateOrderRequest);
             return NoContent();
         }
+
+        /// <summary>
+        /// 下載訂單報表
+        /// </summary>
+        /// <returns>下成成功或失敗的訊息</returns>
+        /// <response code="200">下載成功</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        [HttpPost("report")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GenerateOrderReport([FromBody] OrderQueryParameters orderQueryParameters)
+        {
+            var stream = await _orderService.GenerateOrderReportAsync(orderQueryParameters);
+            // 確保回傳的是一個有效的 FileStreamResult
+            Response.Headers.Append("Content-Disposition", "attachment; filename=order-report.csv");
+
+            // 設定下載檔案的 Content-Type
+            return new FileStreamResult(stream, "text/csv")
+            {
+                // 檔名
+                FileDownloadName = "order-report.csv"
+            };
+        }
     }
 }
