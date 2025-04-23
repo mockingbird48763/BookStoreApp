@@ -1,17 +1,18 @@
-﻿using BookStore.Data;
+﻿using BookStore.Core.Exceptions;
+using BookStore.Data;
 using BookStore.DTO.Request;
 using BookStore.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Services
 {
-    public class MemberService : IMemberService
+    public class MembersService : IMembersService
     {
         private readonly ApplicationDbContext _context;
         private Role? _defaultRole;
 
 
-        public MemberService(ApplicationDbContext context)
+        public MembersService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -21,7 +22,7 @@ namespace BookStore.Services
             // 檢查電子郵件是否已經存在
             if (await _context.Members.AnyAsync(m => m.Email == request.Email))
             {
-                throw new Exception("Email 已存在");
+                throw new EmailAlreadyExistsException("Email 已存在");
             }
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);

@@ -9,10 +9,11 @@ namespace BookStore.API.Controllers
     /// 權限相關
     /// </summary>
     [ApiController]
-    public class AuthController(IAuthService authService) : Controller
+    [Route("api/[controller]")]
+    public class AuthController(IAuthService authService, IMembersService memberService) : Controller
     {
-
         private readonly IAuthService _authService = authService;
+        private readonly IMembersService _memberService = memberService;
 
         // TODO: Register => Login
         /// <summary>
@@ -24,21 +25,25 @@ namespace BookStore.API.Controllers
         /// <response code="400">請求格式錯誤或驗證失敗</response>
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-            }
-            try
-            {
-                string token = await _authService.LoginAsync(loginRequest.Email, loginRequest.Password);
-                return Ok(new { token });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            string token = await _authService.LoginAsync(loginRequest.Email, loginRequest.Password);
+            return Ok(new { token });
+        }
+
+        /// <summary>
+        /// 註冊新會員
+        /// </summary>
+        /// <param name="registerMemberRequest">註冊所需的會員資料</param>
+        /// <returns>註冊成功或錯誤的訊息</returns>
+        /// <response code="200">註冊成功</response>
+        /// <response code="400">請求格式錯誤或驗證失敗</response>
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterMemberRequest registerMemberRequest)
+        {
+            await _memberService.RegisterAsync(registerMemberRequest);
+            return Ok(new { message = "註冊成功" });
         }
     }
 }

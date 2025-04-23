@@ -26,7 +26,7 @@ namespace BookStore.API.Middleware
             {
                 await HandleExceptionAsync(context, StatusCodes.Status400BadRequest, ex.Message);
             }
-            catch (InsufficientStockException ex)
+            catch (Exception ex) when (ex is InsufficientStockException || ex is EmailAlreadyExistsException)
             {
                 await HandleExceptionAsync(context, StatusCodes.Status409Conflict, ex.Message);
             }

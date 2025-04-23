@@ -13,13 +13,15 @@ using BookStore.Core.Extensions;
 using BookStore.Core.Exceptions;
 using BookStore.Models;
 using AutoMapper;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BookStore.Services
 {
-    public class BookService(ApplicationDbContext context, IMapper mapper, IImageStorageService imageStorageService) : IBookService
+    public class BooksService(ApplicationDbContext context, IImageStorageService imageStorageService, IUserInfoContext userInfoContext, IMapper mapper) : IBooksService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IImageStorageService _imageStorageService = imageStorageService;
+        private readonly IUserInfoContext _userInfoContext = userInfoContext;
         private readonly IMapper _mapper = mapper;
 
         public async Task<PaginatedResult<BookSummaryDto>> GetBooksAsync(BookQueryParameters bookQueryParameters)
@@ -31,6 +33,21 @@ namespace BookStore.Services
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
                 .AsQueryable();
+
+            // 權限與可見性處理
+            if (_userInfoContext.IsAdmin)
+            {
+                if (bookQueryParameters.IncludeInvisibleBooks != true)
+                {
+                    // Admin 沒有特別要求看隱藏的書，也只看可見的
+                    query = query.FilterByVisibility(true);
+                }
+            }
+            else
+            {
+                // 一般用戶只能看可見的
+                query = query.FilterByVisibility(true);
+            }
 
             query = query.FilterByAuthor(bookQueryParameters.AuthorId)
                             .FilterByPublisher(bookQueryParameters.PublisherId)
@@ -121,9 +138,20 @@ namespace BookStore.Services
                 .Include(b => b.Publisher)
                 .FirstOrDefaultAsync(b => b.Id == id) ?? throw new NotFoundException($"Book with ID {id} not found.");
 
-            var author = await GetAuthorByIdAsync(updateRequest.AuthorId);
-            var publisher = await GetPublisherByIdAsync(updateRequest.PublisherId);
-            if (!string.Equals(updateRequest.Isbn, book.Isbn))
+            Author? author = null;
+            Publisher? publisher = null;
+
+            if (updateRequest.AuthorId is int authorId)
+            {
+                author = await GetAuthorByIdAsync(authorId);
+            }
+
+            if (updateRequest.PublisherId is int publisherId)
+            {
+                publisher = await GetPublisherByIdAsync(publisherId);
+            }
+
+            if (updateRequest.Isbn != null && !string.Equals(updateRequest.Isbn, book.Isbn))
             {
                 await EnsureIsbnUniqueAsync(updateRequest.Isbn);
             }
@@ -145,14 +173,7 @@ namespace BookStore.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteBookAsync(int id)
-        {
-            await _context.Books
-                .Where(b => b.Id == id)
-                .ExecuteDeleteAsync();
-        }
-
-        public async Task<Author> GetAuthorByIdAsync(int authorId)
+        private async Task<Author> GetAuthorByIdAsync(int authorId)
         {
             var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == authorId);
             if (author == null)
@@ -162,7 +183,7 @@ namespace BookStore.Services
             return author;
         }
 
-        public async Task<Publisher> GetPublisherByIdAsync(int publisherId)
+        private async Task<Publisher> GetPublisherByIdAsync(int publisherId)
         {
             var publisher = await _context.Publishers.FirstOrDefaultAsync(p => p.Id == publisherId);
             if (publisher == null)
@@ -172,7 +193,7 @@ namespace BookStore.Services
             return publisher;
         }
 
-        public async Task EnsureIsbnUniqueAsync(string isbn)
+        private async Task EnsureIsbnUniqueAsync(string isbn)
         {
             if (await _context.Books.AnyAsync(b => b.Isbn == isbn))
             {
@@ -180,6 +201,24 @@ namespace BookStore.Services
             }
         }
 
+        public async Task UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests) {
 
+            var bookIds = requests.Select(r => r.BookId).ToList();
+
+            var books = await _context.Books
+                .Where(b => bookIds.Contains(b.Id))
+                .ToListAsync();
+
+            foreach (var book in books)
+            {
+                var matchingRequest = requests.FirstOrDefault(r => r.BookId == book.Id);
+                if (matchingRequest != null)
+                {
+                    book.IsVisible = matchingRequest.IsVisible;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

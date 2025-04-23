@@ -11,49 +11,40 @@ namespace BookStore.DTO.Request
     public class UpdateBookRequest
     {
         /// <example>978-1-234567-911</example>
-        [Required(ErrorMessage = "ISBN is required.")]
         [StringLength(16, MinimumLength = 16, ErrorMessage = "ISBN must be exactly 16 characters.")]
         [RegularExpression(@"^\d{3}-\d-\d{6}-\d{3}$", ErrorMessage = "ISBN must be in the format '978-1-234567-910'.")]
-        public required string Isbn { get; set; }
+        public string? Isbn { get; set; }
 
         /// <example>改善程式效能</example>
-        [Required(ErrorMessage = "Title is required.")]
         [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
-        public required string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <example>這本書聚焦於提高程式效能，介紹如何優化代碼，改進算法，減少計算時間與資源消耗，並探討常見的效能瓶頸問題。</example>
-        [Required(ErrorMessage = "Description is required.")]
         [StringLength(200, ErrorMessage = "Description cannot be longer than 200 characters.")]
-        public required string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <example>550</example>
-        [Required(ErrorMessage = "List price is required.")]
         [Range(0, int.MaxValue, ErrorMessage = "List price must be greater than or equal to 0.")]
-        public required decimal ListPrice { get; set; }
+        public decimal? ListPrice { get; set; }
 
         /// <example>15</example>
-        [Required(ErrorMessage = "Discount is required.")]
         [Range(0, 100, ErrorMessage = "Discount must be between 0 and 100.")]
-        public required short Discount { get; set; }
+        public short? Discount { get; set; }
 
         /// <example>1</example>
-        [Required(ErrorMessage = "Stock is required.")]
         [Range(0, int.MaxValue, ErrorMessage = "Stock must be greater than or equal to 0.")]
-        public required int Stock { get; set; }
+        public int? Stock { get; set; }
 
         /// <example>2021-04-30</example>
-        [Required(ErrorMessage = "Publication date is required.")]
-        public required DateOnly PublicationDate { get; set; }
+        public DateOnly? PublicationDate { get; set; }
 
         /// <example>1</example>
-        [Required(ErrorMessage = "AuthorId is required.")]
         [Range(0, int.MaxValue, ErrorMessage = "AuthorId must be greater than or equal to 0.")]
-        public required int AuthorId { get; set; }
+        public int? AuthorId { get; set; }
 
         /// <example>1</example>
-        [Required(ErrorMessage = "PublisherId is required.")]
         [Range(0, int.MaxValue, ErrorMessage = "PublisherId must be greater than or equal to 0.")]
-        public required int PublisherId { get; set; }
+        public int? PublisherId { get; set; }
 
         /// <summary>
         /// 上傳書籍封面圖片（僅支援 .jpg/.png，最大 2MB）

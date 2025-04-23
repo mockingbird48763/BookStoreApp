@@ -13,9 +13,9 @@ namespace BookStore.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class BookController(IBookService bookService) : Controller
+    public class BooksController(IBooksService bookService) : Controller
     {
-        private readonly IBookService _bookService = bookService;
+        private readonly IBooksService _bookService = bookService;
 
         // TODO: 改為軟刪除
         // TODO: 更改 api 路徑
@@ -70,7 +70,7 @@ namespace BookStore.API.Controllers
         /// 修改書籍詳細資料
         /// </summary>
         /// <param name="id">書籍的唯一識別碼</param>
-        /// <param name="updateRequest">書籍資料</param>
+        /// <param name="updateRequest">書籍資料，multipart/form-data 在 Swagger 存在限制，無法傳送 null</param>
         /// <response code="204">修改成功</response>
         /// <response code="400">資料格式錯誤</response>
         /// <response code="401">未經身份驗證</response>
@@ -85,18 +85,15 @@ namespace BookStore.API.Controllers
         }
 
         /// <summary>
-        /// 刪除書籍
+        /// 修改書籍的可見屬性
         /// </summary>
-        /// <param name="id">書籍的唯一識別碼</param>
-        /// <returns></returns>
-        /// <response code="204">刪除成功</response>
+        /// <response code="204">修改成功</response>
         /// <response code="401">未經身份驗證</response>
         /// <response code="403">授權不足</response>
-        [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteBook([FromRoute] int id)
-        {
-            await _bookService.DeleteBookAsync(id);
+        [HttpPatch("/visibility")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests) {
+            await _bookService.UpdateBooksVisibility(requests);
             return NoContent();
         }
     }

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.Services
 {
-    public class OrderService(ApplicationDbContext context) : IOrderService
+    public class OrdersService(ApplicationDbContext context) : IOrdersService
     {
         private readonly ApplicationDbContext _context = context;
 

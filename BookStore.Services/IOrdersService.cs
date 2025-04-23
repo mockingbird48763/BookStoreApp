@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.Services
 {
-    public interface IOrderService
+    public interface IOrdersService
     {
         Task<PaginatedResult<OrderSummaryDto>> GetOrdersAsync(OrderQueryParameters orderQueryParameters);
 

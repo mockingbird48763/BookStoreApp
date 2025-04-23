@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BookStore.Models.Enums
+namespace BookStore.Core.Exceptions
 {
-    public enum RoleType
+    public class EmailAlreadyExistsException(string message) : Exception(message)
     {
-        Admin = 1,
-        User = 2,
-        Guest = 9999,
     }
 }

@@ -7,7 +7,7 @@ using BookStore.DTO.Request;
 
 namespace BookStore.Services
 {
-    public interface IMemberService
+    public interface IMembersService
     {
         Task RegisterAsync(RegisterMemberRequest request);
     }

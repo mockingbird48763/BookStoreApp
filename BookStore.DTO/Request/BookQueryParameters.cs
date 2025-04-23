@@ -23,5 +23,7 @@ namespace BookStore.DTO.Request
 
         [StringLength(10, ErrorMessage = "Keyword cannot be longer than 10 characters.")]
         public string? Keyword { get; set; }
+
+        public bool? IncludeInvisibleBooks { get; set; } = false;
     }
 }

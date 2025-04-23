@@ -36,5 +36,11 @@ namespace BookStore.Core.Extensions
             }
             return query;
         }
+
+        public static IQueryable<Book> FilterByVisibility(this IQueryable<Book> query, bool isVisible)
+        {
+            query = query.Where(b => b.IsVisible == isVisible);
+            return query;
+        }
     }
 }

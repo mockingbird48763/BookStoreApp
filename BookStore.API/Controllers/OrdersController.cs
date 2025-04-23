@@ -8,11 +8,14 @@ using System.Security.Claims;
 
 namespace BookStore.API.Controllers
 {
+    /// <summary>
+    /// 訂單相關
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class OrderController(IOrderService orderService) : Controller
+    public class OrdersController(IOrdersService orderService) : Controller
     {
-        private readonly IOrderService _orderService = orderService;
+        private readonly IOrdersService _orderService = orderService;
 
         public int OrderId { get; private set; }
 

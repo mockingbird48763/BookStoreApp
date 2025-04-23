@@ -20,12 +20,14 @@ using BookStore.DTO.Profiles;
 var builder = WebApplication.CreateBuilder(args);
 
 #region DependencyInjection
-builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<IMembersService, MembersService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBooksService, BooksService>();
+builder.Services.AddScoped<IOrdersService, OrdersService>();
 builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserInfoContext, UserInfoContext>();
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -154,6 +156,7 @@ if (app.Environment.IsDevelopment())
         Console.WriteLine("Database initialization complete.");
     }
 }
+
 
 app.UseAuthentication();  // 確保啟用認證
 app.UseAuthorization();   // 確保啟用授權

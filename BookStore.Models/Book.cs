@@ -51,5 +51,7 @@ namespace BookStore.Models
 
         [Timestamp]
         public byte[] RowVersion { get; set; } = [];
+
+        public bool IsVisible { get; set; } = true;
     }
 }
