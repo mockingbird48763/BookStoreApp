@@ -1,4 +1,5 @@
-﻿using Bogus;
+﻿using Azure;
+using Bogus;
 using BookStore.Core.Exceptions;
 using BookStore.Core.Extensions;
 using BookStore.Data;
@@ -6,10 +7,12 @@ using BookStore.DTO.Request;
 using BookStore.DTO.Response;
 using BookStore.Models;
 using BookStore.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -165,6 +168,51 @@ namespace BookStore.Services
             }
         }
 
+        public async Task<FileStream> GenerateOrderReportAsync(OrderQueryParameters orderQueryParameters)
+        {
+            var filePath = Path.Combine(Path.GetTempPath(), "order-report.csv");
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(fileStream, Encoding.UTF8, 1024))
+            {
+                writer.WriteLine("訂單編號,顧客名稱,訂單狀態,訂單日期,總金額"); // CSV 標題行
+
+                var batchSize = 1000;
+                var skip = 0;
+                var orders = await _context.Orders
+                    .Include(o => o.Member)
+                    .FilterByStartDate(orderQueryParameters.StartDate)
+                    .FilterByEndDate(orderQueryParameters.EndDate)
+                    .Skip(skip)
+                    .Take(batchSize)
+                    .ToListAsync();
+
+                decimal totalAmount = 0;
+
+                while (orders.Count != 0)
+                {
+                    foreach (var order in orders)
+                    {
+                        writer.WriteLine($"{order.OrderNumber},{order.Member.Email},{order.OrderStatus},{DateOnly.FromDateTime(order.CreatedAt)},{order.TotalPrice}");
+                        totalAmount += order.TotalPrice;
+                    }
+
+                    writer.Flush();
+
+                    skip += batchSize;
+                    orders = await _context.Orders
+                        .Skip(skip)
+                        .Take(batchSize)
+                        .ToListAsync();
+                }
+
+                writer.WriteLine($"Total,{totalAmount:F2}");
+                writer.Flush();
+            }
+
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        }
+
         public async Task UpdateOrderAsync(int id, UpdateOrderRequest updateOrderRequest)
         {
             var order = await _context.Orders.FindAsync(id) ?? throw new NotFoundException($"Order with ID {id} was not found.");
@@ -223,5 +271,7 @@ namespace BookStore.Services
             var random = new Random();
             return new string([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
         }
+
+
     }
 }
