@@ -15,7 +15,6 @@ namespace BookStore.API.Controllers
         private readonly IAuthService _authService = authService;
         private readonly IMembersService _memberService = memberService;
 
-        // TODO: Register => Login
         /// <summary>
         /// 登錄會員
         /// </summary>

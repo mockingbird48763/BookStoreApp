@@ -14,6 +14,7 @@ using BookStore.Core.Exceptions;
 using BookStore.Models;
 using AutoMapper;
 using static System.Reflection.Metadata.BlobBuilder;
+using Azure;
 
 namespace BookStore.Services
 {
@@ -201,7 +202,7 @@ namespace BookStore.Services
             }
         }
 
-        public async Task UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests) {
+        public async Task UpdateBooksVisibilityAsync(List<BookVisibilityUpdateRequest> requests) {
 
             var bookIds = requests.Select(r => r.BookId).ToList();
 
@@ -219,6 +220,27 @@ namespace BookStore.Services
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<CartBookItemDto>> GetBooksForCartAsync(List<int> ids)
+        {
+            var cartItems = await _context.Books
+                                   .Where(book => ids.Contains(book.Id))
+                                   .Select(book => new CartBookItemDto
+                                   {
+                                       Id = book.Id,
+                                       Title = book.Title,
+                                       UnitPrice = CountUnitPrice(book.ListPrice, book.Discount),
+                                       Stock = book.Stock,
+                                       ImagePath = book.ImagePath
+                                   })
+                                   .ToListAsync();
+            return cartItems;
+        }
+
+        private static decimal CountUnitPrice(decimal listPrice, int discount)
+        {
+            return Math.Round(listPrice * (discount / 100m), 0);
         }
     }
 }

@@ -19,7 +19,6 @@ namespace BookStore.API.Controllers
 
         public int OrderId { get; private set; }
 
-        // TODO: 權限設定
         /// <summary>
         /// 獲取訂單列表
         /// </summary>

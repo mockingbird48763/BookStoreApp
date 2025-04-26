@@ -17,8 +17,6 @@ namespace BookStore.API.Controllers
     {
         private readonly IBooksService _bookService = bookService;
 
-        // TODO: 改為軟刪除
-        // TODO: 更改 api 路徑
         /// <summary>
         /// 獲取書籍列表
         /// </summary>
@@ -48,7 +46,6 @@ namespace BookStore.API.Controllers
             return Ok(book);
         }
 
-        // TODO: 添加權限
         /// <summary>
         /// 新增書籍
         /// </summary>
@@ -90,11 +87,35 @@ namespace BookStore.API.Controllers
         /// <response code="204">修改成功</response>
         /// <response code="401">未經身份驗證</response>
         /// <response code="403">授權不足</response>
-        [HttpPatch("/visibility")]
-        [AllowAnonymous]
+        [HttpPatch]
+        [Route("visibility")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests) {
-            await _bookService.UpdateBooksVisibility(requests);
+            await _bookService.UpdateBooksVisibilityAsync(requests);
             return NoContent();
+        }
+
+        /// <summary>
+        /// 批量獲取書籍資料，用於購物車頁面
+        /// </summary>
+        /// <response code="200">獲取成功</response>
+        /// <response code="400">資料格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        [HttpGet("cart")]
+        [Authorize(Roles = "User, Admin")]
+
+        public async Task<IActionResult> GetBooksForCartByIds([FromQuery] List<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+                return BadRequest("IDs cannot be null or empty.");
+
+            var result = await _bookService.GetBooksForCartAsync(ids);
+
+            if (result.Count != 0)
+                return Ok(result);
+
+            return NotFound("No books available.");
         }
     }
 }
