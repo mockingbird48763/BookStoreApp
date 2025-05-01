@@ -35,24 +35,11 @@ namespace BookStore.Services
                 .Include(b => b.Publisher)
                 .AsQueryable();
 
-            // 權限與可見性處理
-            if (_userInfoContext.IsAdmin)
-            {
-                if (bookQueryParameters.IncludeInvisibleBooks != true)
-                {
-                    // Admin 沒有特別要求看隱藏的書，也只看可見的
-                    query = query.FilterByVisibility(true);
-                }
-            }
-            else
-            {
-                // 一般用戶只能看可見的
-                query = query.FilterByVisibility(true);
-            }
-
-            query = query.FilterByAuthor(bookQueryParameters.AuthorId)
-                            .FilterByPublisher(bookQueryParameters.PublisherId)
-                            .FilterByKeyword(bookQueryParameters.Keyword);
+            query = query.FilterByVisibility(true)
+                .FilterByStockGreaterThan(0)
+                .FilterByAuthor(bookQueryParameters.AuthorId)
+                .FilterByPublisher(bookQueryParameters.PublisherId)
+                .FilterByKeyword(bookQueryParameters.Keyword);
 
             var totalCount = await query.CountAsync();
             // var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
@@ -263,6 +250,51 @@ namespace BookStore.Services
                     Name = a.Name
                 })
                 .ToListAsync();
+        }
+
+        public async Task<PaginatedResult<BookSummaryForManagementDto>> GetBooksForManagementAsync(BookQueryParameters bookQueryParameters)
+        {
+            var page = bookQueryParameters.Page;
+            var pageSize = bookQueryParameters.PageSize;
+
+            var query = _context.Books
+                //.Include(b => b.Author)
+                //.Include(b => b.Publisher)
+                .AsQueryable();
+
+            query = query
+                .FilterByAuthor(bookQueryParameters.AuthorId)
+                .FilterByPublisher(bookQueryParameters.PublisherId)
+                .FilterByKeyword(bookQueryParameters.Keyword);
+
+            var totalCount = await query.CountAsync();
+            // var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            var books = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            PaginatedResult<BookSummaryForManagementDto> result = new()
+            {
+                Items = [.. books.Select(b => new BookSummaryForManagementDto
+                {
+                    Id = b.Id,
+                    ImagePath = b.ImagePath,
+                    Title = b.Title,
+                    ListPrice = b.ListPrice,
+                    Discount = b.Discount,
+                    UnitPrice
+                    = CountUnitPrice(b.ListPrice, b.Discount),
+                    Stock = b.Stock,
+                    IsVisible = b.IsVisible
+                })],
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+
+            return result;
         }
     }
 }

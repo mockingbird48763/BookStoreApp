@@ -42,5 +42,11 @@ namespace BookStore.Core.Extensions
             query = query.Where(b => b.IsVisible == isVisible);
             return query;
         }
+
+        public static IQueryable<Book> FilterByStockGreaterThan(this IQueryable<Book> query, int stock)
+        {
+            return query.Where(b => b.Stock > stock);
+        }
+
     }
 }

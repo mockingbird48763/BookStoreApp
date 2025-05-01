@@ -19,5 +19,6 @@ namespace BookStore.Services
         Task<List<CartBookItemDto>> GetBooksForCartAsync(List<int> ids);
         Task<ICollection<PublisherDTO>> GetPublishersAsync();
         Task<ICollection<AuthorDTO>> GetAuthorsAsync();
+        Task<PaginatedResult<BookSummaryForManagementDto>> GetBooksForManagementAsync(BookQueryParameters bookQueryParameters);
     }
 }

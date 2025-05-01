@@ -141,5 +141,20 @@ namespace BookStore.API.Controllers
         {
             return Ok(await _bookService.GetPublishersAsync());
         }
+
+        /// <summary>
+        /// 獲取書籍列表(提供後台使用)
+        /// </summary>
+        /// <response code="200">獲取成功</response>
+        /// <response code="400">資料格式錯誤</response>
+        /// <response code="401">未經身份驗證</response>
+        /// <response code="403">授權不足</response>
+        [HttpGet]
+        [Route("management")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBooksForManagement([FromQuery] BookQueryParameters bookQueryParameters)
+        {
+            return Ok(await _bookService.GetBooksForManagementAsync(bookQueryParameters));
+        }
     }
 }
