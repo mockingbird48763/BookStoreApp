@@ -17,5 +17,7 @@ namespace BookStore.Services
         Task UpdateBookAsync(int id, UpdateBookRequest updateRequest);
         Task UpdateBooksVisibilityAsync(List<BookVisibilityUpdateRequest> requests);
         Task<List<CartBookItemDto>> GetBooksForCartAsync(List<int> ids);
+        Task<ICollection<PublisherDTO>> GetPublishersAsync();
+        Task<ICollection<AuthorDTO>> GetAuthorsAsync();
     }
 }

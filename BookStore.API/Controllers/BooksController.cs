@@ -117,5 +117,29 @@ namespace BookStore.API.Controllers
 
             return NotFound("No books available.");
         }
+
+        /// <summary>
+        /// 獲取作者列表
+        /// </summary>
+        /// <response code="200">獲取成功</response>
+        [HttpGet]
+        [Route("/authors")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAuthors()
+        {
+            return Ok(await _bookService.GetAuthorsAsync());
+        }
+
+        /// <summary>
+        /// 獲取出版社列表
+        /// </summary>
+        /// <response code="200">獲取成功</response>
+        [HttpGet]
+        [Route("/publishers")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPublishers()
+        {
+            return Ok(await _bookService.GetPublishersAsync());
+        }
     }
 }

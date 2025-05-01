@@ -242,5 +242,27 @@ namespace BookStore.Services
         {
             return Math.Round(listPrice * (discount / 100m), 0);
         }
+
+        public async Task<ICollection<PublisherDTO>> GetPublishersAsync()
+        {
+            return await _context.Publishers
+                .Select(a => new PublisherDTO
+                {
+                    Id = a.Id,
+                    Name = a.Name
+                })
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<AuthorDTO>> GetAuthorsAsync()
+        {
+            return await _context.Authors
+                .Select(a => new AuthorDTO
+                {
+                    Id = a.Id,
+                    Name = a.Name
+                })
+                .ToListAsync();
+        }
     }
 }
