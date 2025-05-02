@@ -39,8 +39,16 @@ namespace BookStore.DTO.Request
 
         public DateOnly? EndDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
-        [SwaggerIgnore]
-        public String RoleName { get; set; } = String.Empty;
-
+        /// <summary>
+        /// 檢視模式，根據角色切換不同資料顯示。
+        /// </summary>
+        /// <remarks>
+        /// 可用值：
+        /// <list type="bullet">
+        ///   <item><description><c>admin</c> - 管理者視角，包含所有資料。</description></item>
+        /// </list>
+        /// </remarks>
+        /// <example>admin</example>
+        public String? ViewAs { get; set; } = String.Empty;
     }
 }

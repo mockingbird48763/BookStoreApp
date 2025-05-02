@@ -123,7 +123,7 @@ namespace BookStore.API.Controllers
         /// </summary>
         /// <response code="200">獲取成功</response>
         [HttpGet]
-        [Route("/authors")]
+        [Route("/api/authors")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAuthors()
         {
@@ -135,7 +135,7 @@ namespace BookStore.API.Controllers
         /// </summary>
         /// <response code="200">獲取成功</response>
         [HttpGet]
-        [Route("/publishers")]
+        [Route("/api/publishers")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPublishers()
         {

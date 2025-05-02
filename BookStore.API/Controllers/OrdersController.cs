@@ -31,14 +31,6 @@ namespace BookStore.API.Controllers
         [Authorize(Roles = "User, Admin")]
         public async Task<IActionResult> GetOrders([FromQuery] OrderQueryParameters orderQueryParameters)
         {
-            var isAdmin = User.IsInRole(RoleType.Admin.ToString());
-            orderQueryParameters.RoleName = isAdmin ? RoleType.Admin.ToString() : RoleType.User.ToString();
-
-            if (!isAdmin)
-            {
-                orderQueryParameters.MemberId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            }
-
             return Ok(await _orderService.GetOrdersAsync(orderQueryParameters));
         }
 

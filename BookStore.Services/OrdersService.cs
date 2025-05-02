@@ -19,9 +19,11 @@ using System.Threading.Tasks;
 
 namespace BookStore.Services
 {
-    public class OrdersService(ApplicationDbContext context) : IOrdersService
+    public class OrdersService(ApplicationDbContext context, IUserInfoContext userInfoContext) : IOrdersService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IUserInfoContext _userInfoContext = userInfoContext;
+
 
         public async Task<PaginatedResult<OrderSummaryDto>> GetOrdersAsync(OrderQueryParameters orderQueryParameters)
         {
@@ -35,13 +37,17 @@ namespace BookStore.Services
                 .FilterByPaymentMethod(orderQueryParameters.PaymentMethod)
                 .FilterByShippingMethod(orderQueryParameters.ShippingMethod)
                 .FilterByStartDate(orderQueryParameters.StartDate)
-                .FilterByEndDate(orderQueryParameters.EndDate)
-                .FilterByRoleAndMemberId(orderQueryParameters.RoleName, orderQueryParameters.MemberId);
+                .FilterByEndDate(orderQueryParameters.EndDate);
+
+            if (!(_userInfoContext.IsAdmin && orderQueryParameters.ViewAs == "admin")) {
+                query = query.Where(o => o.Member.Id == int.Parse(_userInfoContext.UserId));
+            }
 
             var totalCount = await query.CountAsync();
 
             // 查詢結果
             var orders = await query
+                .OrderByDescending(o => o.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(o => new OrderSummaryDto()
@@ -271,7 +277,5 @@ namespace BookStore.Services
             var random = new Random();
             return new string([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
         }
-
-
     }
 }

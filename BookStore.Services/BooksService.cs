@@ -45,6 +45,7 @@ namespace BookStore.Services
             // var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             var books = await query
+                .OrderByDescending(b => b.PublicationDate)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -66,7 +67,7 @@ namespace BookStore.Services
 
             return result;
         }
-
+        
         public async Task<BookDetailDto> GetByIdAsync(int id)
         {
             var book = await _context.Books
@@ -148,6 +149,7 @@ namespace BookStore.Services
             if (updateRequest.UploadedImage != null)
             {
                 imagePath = await _imageStorageService.UploadAsync(updateRequest.UploadedImage);
+                Console.WriteLine($"ImagePath: {imagePath}");
             }
 
             _mapper.Map(updateRequest, book);
@@ -271,6 +273,7 @@ namespace BookStore.Services
             // var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             var books = await query
+                .OrderByDescending(b => b.PublicationDate)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

@@ -17,7 +17,13 @@ namespace BookStore.DTO.Profiles
             // 定義 CreateBookRequest 和 Book 之間的映射
             // src -> dest
             CreateMap<UpdateBookRequest, Book>()
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) =>
+                    srcMember != null &&
+                    // 忽略預設值的部分
+                    !(srcMember is int i && i == 0) &&
+                    !(srcMember is decimal d && d == 0m) &&
+                    !(srcMember is short s && s == 0) &&
+                    !(srcMember is DateOnly date && date == default)));
 
             // 可配置其他映射
             // CreateMap<BookDto, Book>()
