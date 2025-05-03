@@ -24,14 +24,24 @@ builder.Services.AddScoped<IMembersService, MembersService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IOrdersService, OrdersService>();
-builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserInfoContext, UserInfoContext>();
 
-if (!builder.Environment.IsDevelopment())
+bool enableCloudStorage = args.Contains("--enableCloudStorage");
+if (!enableCloudStorage)
 {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("啟用本地圖片儲存");
+    builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
+    Console.ResetColor();
+}
+else
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("啟用雲端圖片儲存");
     builder.Services.AddScoped<IImageStorageStrategy, CloudImageStorageStrategy>();
+    Console.ResetColor();
 }
 builder.Services.AddControllers();
 #endregion
@@ -148,15 +158,16 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
-
-    // dotnet run --seed
-    if (args.Contains("--seed"))
-    {
-        await InitializeDatabaseAsync(app.Services);
-        Console.WriteLine("Database initialization complete.");
-    }
 }
 
+// dotnet run --seed
+if (args.Contains("--seed"))
+{
+    await InitializeDatabaseAsync(app.Services);
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("初始化資料庫完成");
+    Console.ResetColor();
+}
 
 app.UseAuthentication();  // 確保啟用認證
 app.UseAuthorization();   // 確保啟用授權
