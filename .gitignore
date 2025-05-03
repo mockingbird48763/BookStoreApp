@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# 忽略 wwwroot 下的所有檔案和資料夾
+BookStore.API/wwwroot/images/*
+
+# 但不要忽略 wwwroot/images/example 資料夾及其內容
+!BookStore.API/wwwroot/images/example/
+!BookStore.API/wwwroot/images/example/**
+
 # User-specific files
 *.rsuser
 *.suo
