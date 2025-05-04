@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace BookStore.Services.FileStorageStrategies
+namespace BookStore.Services.ImageStorageStrategies
 {
     public class LocalImageStorageStrategy : IImageStorageStrategy
     {

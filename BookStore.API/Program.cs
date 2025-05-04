@@ -5,7 +5,6 @@ using BookStore.Data;
 using BookStore.DTO.Request;
 using BookStore.DTO.Validators;
 using BookStore.Services;
-using BookStore.Services.FileStorageStrategies;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +18,7 @@ using BookStore.DTO.Profiles;
 using BookStore.API.Controllers;
 using BookStore.API.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using BookStore.Services.ImageStorageStrategies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,6 +133,7 @@ builder.Services.AddSwaggerGen(options =>
 #endregion
 
 #region DbContext
+// UseSqlServer 方法強制指定這段連線字串是給 SQL Server 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
