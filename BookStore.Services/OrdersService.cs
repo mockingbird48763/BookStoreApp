@@ -39,7 +39,8 @@ namespace BookStore.Services
                 .FilterByStartDate(orderQueryParameters.StartDate)
                 .FilterByEndDate(orderQueryParameters.EndDate);
 
-            if (!(_userInfoContext.IsAdmin && orderQueryParameters.ViewAs == "admin")) {
+            if (!(_userInfoContext.IsAdmin && orderQueryParameters.ViewAs == "admin"))
+            {
                 query = query.Where(o => o.Member.Id == int.Parse(_userInfoContext.UserId));
             }
 
@@ -272,7 +273,8 @@ namespace BookStore.Services
             return orderNumber;
         }
 
-        private static string GenerateRandomCode(int length = 4) {
+        private static string GenerateRandomCode(int length = 4)
+        {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
             var random = new Random();
             return new string([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);

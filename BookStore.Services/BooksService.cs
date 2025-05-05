@@ -67,7 +67,7 @@ namespace BookStore.Services
 
             return result;
         }
-        
+
         public async Task<BookDetailDto> GetByIdAsync(int id)
         {
             var book = await _context.Books
@@ -191,7 +191,8 @@ namespace BookStore.Services
             }
         }
 
-        public async Task UpdateBooksVisibilityAsync(List<BookVisibilityUpdateRequest> requests) {
+        public async Task UpdateBooksVisibilityAsync(List<BookVisibilityUpdateRequest> requests)
+        {
 
             var bookIds = requests.Select(r => r.BookId).ToList();
 

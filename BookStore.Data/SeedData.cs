@@ -36,7 +36,8 @@ namespace BookStore.Data
             await context.SaveChangesAsync();
         }
 
-        private static List<Member> SeedMembers(ApplicationDbContext context) {
+        private static List<Member> SeedMembers(ApplicationDbContext context)
+        {
             var roles = AddRoles(context);
             return AddMembers(context, roles);
         }
@@ -45,12 +46,13 @@ namespace BookStore.Data
         {
             var authors = AddAuthors(context);
             var publishers = AddPublishers(context);
-            return AddBooks(context, authors, publishers);     
+            return AddBooks(context, authors, publishers);
         }
 
-        private static List<Order> SeedOrders(ApplicationDbContext context, List<Member> members, List<Book> books, int count, DateTime? orderSeedDate) {
+        private static List<Order> SeedOrders(ApplicationDbContext context, List<Member> members, List<Book> books, int count, DateTime? orderSeedDate)
+        {
             var orders = Enumerable.Range(0, count)
-                .Select(_ => 
+                .Select(_ =>
                 {
                     var orderItems = GenerateOrderItems(books);
                     return GenerateOrder(
@@ -111,7 +113,7 @@ namespace BookStore.Data
             context.Members.AddRange(members);
             return members;
         }
-        
+
         private static List<Author> AddAuthors(ApplicationDbContext context)
         {
             var authorNames = new List<string> {
@@ -121,7 +123,7 @@ namespace BookStore.Data
             context.Authors.AddRange(authors);
             return authors;
         }
-        
+
         private static List<Publisher> AddPublishers(ApplicationDbContext context)
         {
             var publisherNames = new List<string> {
@@ -131,8 +133,9 @@ namespace BookStore.Data
             context.Publishers.AddRange(publishers);
             return publishers;
         }
-        
-        private static List<Book> AddBooks(ApplicationDbContext context, List<Author> authors, List<Publisher> publishers) {
+
+        private static List<Book> AddBooks(ApplicationDbContext context, List<Author> authors, List<Publisher> publishers)
+        {
             List<Book> books = [
                 new Book
                 {
@@ -430,7 +433,8 @@ namespace BookStore.Data
             return faker.Date.Past(years, baseDate);
         }
 
-        private static string GenerateOrderNumber(DateTime date) {
+        private static string GenerateOrderNumber(DateTime date)
+        {
             var dataFormat = date.ToString("yyyyMMdd_HHmmss");
             var randomCode = faker.Random.AlphaNumeric(4).ToLower();
             var orderNumber = $"{dataFormat}_{randomCode}";
@@ -441,7 +445,7 @@ namespace BookStore.Data
         {
             return new OrderItem
             {
-                UnitPrice = (int)Math.Round(book.ListPrice * (book.Discount/100m), MidpointRounding.AwayFromZero),
+                UnitPrice = (int)Math.Round(book.ListPrice * (book.Discount / 100m), MidpointRounding.AwayFromZero),
                 Quantity = quantity,
                 Book = book,
             };
@@ -460,7 +464,8 @@ namespace BookStore.Data
             return orderItems;
         }
 
-        private static Order GenerateOrder(Member member, List<OrderItem> orderItems, DateTime? orderSeedDate) {
+        private static Order GenerateOrder(Member member, List<OrderItem> orderItems, DateTime? orderSeedDate)
+        {
             DateTime createdAt = GenerateRandomDateBefore(orderSeedDate ?? DateTime.UtcNow);
             return new Order
             {
@@ -493,7 +498,7 @@ namespace BookStore.Data
         }
 
         private static string GenerateRandomShippingNote()
-        { 
+        {
             var shippingNotes = new List<string> {
                 "請勿放在門口",
                 "請放在郵筒內",

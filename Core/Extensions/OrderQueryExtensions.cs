@@ -61,7 +61,7 @@ namespace BookStore.Core.Extensions
             if (startDate.HasValue)
             {
                 // 轉成當天 00:00:00
-                var start = startDate.Value.ToDateTime(TimeOnly.MinValue); 
+                var start = startDate.Value.ToDateTime(TimeOnly.MinValue);
                 query = query.Where(o => o.CreatedAt >= start);
             }
             return query;
@@ -72,7 +72,7 @@ namespace BookStore.Core.Extensions
             if (endDate.HasValue)
             {
                 // 轉成當天 23:59:59.9999999
-                var end = endDate.Value.ToDateTime(TimeOnly.MaxValue); 
+                var end = endDate.Value.ToDateTime(TimeOnly.MaxValue);
                 query = query.Where(b => b.CreatedAt <= end);
             }
             return query;

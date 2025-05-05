@@ -190,9 +190,19 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("目前是開發環境");
+    Console.ResetColor();
+}
+else if (app.Environment.IsProduction())
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("目前是生產環境");
+    Console.ResetColor();
 }
 
-# region 資料初始化
+#region 資料初始化
 // $env:INITIAL_SEED_DATA = "true"
 // echo $env:INITIAL_SEED_DATA
 string? seedDataEnvVar = Environment.GetEnvironmentVariable("INITIAL_SEED_DATA");

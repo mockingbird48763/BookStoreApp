@@ -71,9 +71,10 @@ namespace BookStore.API.Controllers
 
             User.IsInRole("Admin");
             User.IsInRole("Manager");
-            return Ok(new { 
-                userId, 
-                email, 
+            return Ok(new
+            {
+                userId,
+                email,
                 roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(), // ["Admin", "User"]
                 isAdmin = User.IsInRole(RoleType.Admin.ToString()),
                 isUser = User.IsInRole(RoleType.User.ToString()),
@@ -118,8 +119,7 @@ namespace BookStore.API.Controllers
             {
                 await image.CopyToAsync(stream); // 將上傳的檔案寫入指定路徑
             }
-
-            return Ok(new { message = "上傳成功", fileName = $"{datePart}_{randomStr}{fileExtension}" });
+            return Ok(new { message = "Success", fileName = $"{datePart}_{randomStr}{fileExtension}" });
         }
 
         [HttpPost("download-report1")]
@@ -209,7 +209,8 @@ namespace BookStore.API.Controllers
         /// 測試 Google Cloud Storage 上傳檔案
         /// </summary>
         [HttpPost("upload-file")]
-        public async Task<IActionResult> AddFile([FromBody] FileUpload fileUpload) { 
+        public async Task<IActionResult> AddFile([FromBody] FileUpload fileUpload)
+        {
             var client = StorageClient.Create();
             var file = Encoding.UTF8.GetBytes(fileUpload.File);
 
