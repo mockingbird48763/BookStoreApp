@@ -18,7 +18,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ONLINE_STORAGE_ENABLED": "false",
-        "INITIAL_SEED_DATA": "false",
         "GOOGLE_APPLICATION_CREDENTIALS": "D:\\secret.json",
         "GCS_BUCKET_NAME": "book_store_storage_mockingbird48763_v2"
       }
@@ -30,7 +29,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ONLINE_STORAGE_ENABLED": "false",
-        "INITIAL_SEED_DATA": "false",
         "GOOGLE_APPLICATION_CREDENTIALS": "D:\\secret.json",
         "GCS_BUCKET_NAME": "book_store_storage_mockingbird48763_v2"
       }

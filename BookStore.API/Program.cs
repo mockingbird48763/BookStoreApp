@@ -39,13 +39,17 @@ bool isOnlineStorageEnabled = !string.IsNullOrEmpty(onlineStorageEnvVar) && onli
 if (!isOnlineStorageEnabled)
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("啟用本地圖片儲存");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Local image storage enabled");
+    Console.WriteLine("# -------------------------------");
     builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
 }
 else
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("啟用雲端圖片儲存");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Cloud image storage enabled");
+    Console.WriteLine("# -------------------------------");
     builder.Services.AddScoped<IImageStorageStrategy, CloudImageStorageStrategy>();
 }
 Console.ResetColor();
@@ -174,11 +178,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 #endregion
 
-#region 環境變數
-// 設置 GOOGLE_APPLICATION_CREDENTIALS 環境變數
-Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"D:\secret.json");
-#endregion
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -190,30 +189,19 @@ if (app.Environment.IsDevelopment())
         // 文檔目錄功能
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", $"BookStore API Docs V1");
     });
-
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("目前是開發環境");
-    Console.ResetColor();
-}
-else if (app.Environment.IsProduction())
-{
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("目前是生產環境");
-    Console.ResetColor();
 }
 
 #region 資料初始化
-// $env:INITIAL_SEED_DATA = "true"
-// echo $env:INITIAL_SEED_DATA
-string? seedDataEnvVar = Environment.GetEnvironmentVariable("INITIAL_SEED_DATA");
-// seedDataEnvVar?.Equals("true", StringComparison.OrdinalIgnoreCase) == true
-// ?Equals 可能是 null，所以要用 == true
-if (seedDataEnvVar == "true")
+if (args.Contains("--seed"))
 {
     await InitializeDatabaseAsync(app.Services);
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("初始化資料庫資料完成");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Database data initialization completed");
+    Console.WriteLine("# -------------------------------");
     Console.ResetColor();
+    // 初始化後直接結束
+    return;
 }
 # endregion
 
