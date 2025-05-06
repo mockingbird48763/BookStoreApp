@@ -36,7 +36,8 @@ namespace BookStore.Data
             await context.SaveChangesAsync();
         }
 
-        private static List<Member> SeedMembers(ApplicationDbContext context) {
+        private static List<Member> SeedMembers(ApplicationDbContext context)
+        {
             var roles = AddRoles(context);
             return AddMembers(context, roles);
         }
@@ -45,12 +46,13 @@ namespace BookStore.Data
         {
             var authors = AddAuthors(context);
             var publishers = AddPublishers(context);
-            return AddBooks(context, authors, publishers);     
+            return AddBooks(context, authors, publishers);
         }
 
-        private static List<Order> SeedOrders(ApplicationDbContext context, List<Member> members, List<Book> books, int count, DateTime? orderSeedDate) {
+        private static List<Order> SeedOrders(ApplicationDbContext context, List<Member> members, List<Book> books, int count, DateTime? orderSeedDate)
+        {
             var orders = Enumerable.Range(0, count)
-                .Select(_ => 
+                .Select(_ =>
                 {
                     var orderItems = GenerateOrderItems(books);
                     return GenerateOrder(
@@ -111,7 +113,7 @@ namespace BookStore.Data
             context.Members.AddRange(members);
             return members;
         }
-        
+
         private static List<Author> AddAuthors(ApplicationDbContext context)
         {
             var authorNames = new List<string> {
@@ -121,7 +123,7 @@ namespace BookStore.Data
             context.Authors.AddRange(authors);
             return authors;
         }
-        
+
         private static List<Publisher> AddPublishers(ApplicationDbContext context)
         {
             var publisherNames = new List<string> {
@@ -131,8 +133,9 @@ namespace BookStore.Data
             context.Publishers.AddRange(publishers);
             return publishers;
         }
-        
-        private static List<Book> AddBooks(ApplicationDbContext context, List<Author> authors, List<Publisher> publishers) {
+
+        private static List<Book> AddBooks(ApplicationDbContext context, List<Author> authors, List<Publisher> publishers)
+        {
             List<Book> books = [
                 new Book
                 {
@@ -143,7 +146,7 @@ namespace BookStore.Data
                     Discount = 65,
                     Stock = 6,
                     PublicationDate = new DateOnly(2020, 12, 10),
-                    ImagePath = "example/20000000_000000_0001.png",
+                    ImagePath = "example/20000000_000000_0001.jpg",
                     Author = authors[0],
                     Publisher = publishers[0],
                 },
@@ -156,7 +159,7 @@ namespace BookStore.Data
                     Discount = 88,
                     Stock = 1,
                     PublicationDate = new DateOnly(2021, 4, 30),
-                    ImagePath = "example/20000000_000000_0002.png",
+                    ImagePath = "example/20000000_000000_0002.jpg",
                     Author = authors[1],
                     Publisher = publishers[1],
                 },
@@ -169,7 +172,7 @@ namespace BookStore.Data
                     Discount = 92,
                     Stock = 9,
                     PublicationDate = new DateOnly(2022, 2, 14),
-                    ImagePath = "example/20000000_000000_0003.png",
+                    ImagePath = "example/20000000_000000_0003.jpg",
                     Author = authors[2],
                     Publisher = publishers[2],
                 },
@@ -182,7 +185,7 @@ namespace BookStore.Data
                     Discount = 93,
                     Stock = 3,
                     PublicationDate = new DateOnly(2021, 6, 1),
-                    ImagePath = "example/20000000_000000_0004.png",
+                    ImagePath = "example/20000000_000000_0004.jpg",
                     Author = authors[3],
                     Publisher = publishers[3],
                 },
@@ -195,7 +198,7 @@ namespace BookStore.Data
                     Discount = 86,
                     Stock = 7,
                     PublicationDate = new DateOnly(2021, 8, 25),
-                    ImagePath = "example/20000000_000000_0005.png",
+                    ImagePath = "example/20000000_000000_0005.jpg",
                     Author = authors[4],
                     Publisher = publishers[4],
                 },
@@ -208,7 +211,7 @@ namespace BookStore.Data
                     Discount = 75,
                     Stock = 2,
                     PublicationDate = new DateOnly(2023, 3, 12),
-                    ImagePath = "example/20000000_000000_0006.png",
+                    ImagePath = "example/20000000_000000_0006.jpg",
                     Author = authors[0],
                     Publisher = publishers[0],
                 },
@@ -221,7 +224,7 @@ namespace BookStore.Data
                     Discount = 67,
                     Stock = 10,
                     PublicationDate = new DateOnly(2022, 9, 10),
-                    ImagePath = "example/20000000_000000_0007.png",
+                    ImagePath = "example/20000000_000000_0007.jpg",
                     Author = authors[1],
                     Publisher = publishers[1],
                 },
@@ -234,7 +237,7 @@ namespace BookStore.Data
                     Discount = 69,
                     Stock = 4,
                     PublicationDate = new DateOnly(2021, 11, 5),
-                    ImagePath = "example/20000000_000000_0008.png",
+                    ImagePath = "example/20000000_000000_0008.jpg",
                     Author = authors[2],
                     Publisher = publishers[2],
                 },
@@ -247,7 +250,7 @@ namespace BookStore.Data
                     Discount = 80,
                     Stock = 0,
                     PublicationDate = new DateOnly(2020, 7, 15),
-                    ImagePath = "example/20000000_000000_0009.png",
+                    ImagePath = "example/20000000_000000_0009.jpg",
                     Author = authors[3],
                     Publisher = publishers[3],
                 },
@@ -260,7 +263,7 @@ namespace BookStore.Data
                     Discount = 82,
                     Stock = 8,
                     PublicationDate = new DateOnly(2023, 1, 8),
-                    ImagePath = "example/20000000_000000_0010.png",
+                    ImagePath = "example/20000000_000000_0010.jpg",
                     Author = authors[4],
                     Publisher = publishers[4],
                 },
@@ -273,7 +276,7 @@ namespace BookStore.Data
                     Discount = 61,
                     Stock = 2,
                     PublicationDate = new DateOnly(2022, 4, 22),
-                    ImagePath = "example/20000000_000000_0011.png",
+                    ImagePath = "example/20000000_000000_0011.jpg",
                     Author = authors[0],
                     Publisher = publishers[0],
                 },
@@ -286,7 +289,7 @@ namespace BookStore.Data
                     Discount = 90,
                     Stock = 5,
                     PublicationDate = new DateOnly(2021, 12, 12),
-                    ImagePath = "example/20000000_000000_0012.png",
+                    ImagePath = "example/20000000_000000_0012.jpg",
                     Author = authors[1],
                     Publisher = publishers[1],
                 },
@@ -299,7 +302,7 @@ namespace BookStore.Data
                     Discount = 87,
                     Stock = 1,
                     PublicationDate = new DateOnly(2023, 6, 5),
-                    ImagePath = "example/20000000_000000_0013.png",
+                    ImagePath = "example/20000000_000000_0013.jpg",
                     Author = authors[2],
                     Publisher = publishers[2],
                 },
@@ -312,7 +315,7 @@ namespace BookStore.Data
                     Discount = 83,
                     Stock = 6,
                     PublicationDate = new DateOnly(2022, 10, 1),
-                    ImagePath = "example/20000000_000000_0014.png",
+                    ImagePath = "example/20000000_000000_0014.jpg",
                     Author = authors[3],
                     Publisher = publishers[3],
                 },
@@ -325,7 +328,7 @@ namespace BookStore.Data
                     Discount = 66,
                     Stock = 0,
                     PublicationDate = new DateOnly(2023, 2, 15),
-                    ImagePath = "example/20000000_000000_0015.png",
+                    ImagePath = "example/20000000_000000_0015.jpg",
                     Author = authors[4],
                     Publisher = publishers[4],
                 },
@@ -338,7 +341,7 @@ namespace BookStore.Data
                     Discount = 71,
                     Stock = 9,
                     PublicationDate = new DateOnly(2021, 7, 20),
-                    ImagePath = "example/20000000_000000_0016.png",
+                    ImagePath = "example/20000000_000000_0016.jpg",
                     Author = authors[0],
                     Publisher = publishers[0],
                 },
@@ -351,7 +354,7 @@ namespace BookStore.Data
                     Discount = 70,
                     Stock = 7,
                     PublicationDate = new DateOnly(2022, 3, 28),
-                    ImagePath = "example/20000000_000000_0017.png",
+                    ImagePath = "example/20000000_000000_0017.jpg",
                     Author = authors[1],
                     Publisher = publishers[1],
                 },
@@ -364,7 +367,7 @@ namespace BookStore.Data
                     Discount = 63,
                     Stock = 3,
                     PublicationDate = new DateOnly(2023, 5, 14),
-                    ImagePath = "example/20000000_000000_0018.png",
+                    ImagePath = "example/20000000_000000_0018.jpg",
                     Author = authors[2],
                     Publisher = publishers[2],
                 },
@@ -377,7 +380,7 @@ namespace BookStore.Data
                     Discount = 77,
                     Stock = 4,
                     PublicationDate = new DateOnly(2022, 11, 3),
-                    ImagePath = "example/20000000_000000_0019.png",
+                    ImagePath = "example/20000000_000000_0019.jpg",
                     Author = authors[0],
                     Publisher = publishers[0],
                 },
@@ -390,7 +393,7 @@ namespace BookStore.Data
                     Discount = 84,
                     Stock = 10,
                     PublicationDate = new DateOnly(2021, 10, 10),
-                    ImagePath = "example/20000000_000000_0020.png",
+                    ImagePath = "example/20000000_000000_0020.jpg",
                     Author = authors[1],
                     Publisher = publishers[1],
                 },
@@ -403,7 +406,7 @@ namespace BookStore.Data
                     Discount = 81,
                     Stock = 1,
                     PublicationDate = new DateOnly(2023, 7, 18),
-                    ImagePath = "example/20000000_000000_0021.png",
+                    ImagePath = "example/20000000_000000_0021.jpg",
                     Author = authors[2],
                     Publisher = publishers[2],
                 },
@@ -416,7 +419,7 @@ namespace BookStore.Data
                     Discount = 70,
                     Stock = 8,
                     PublicationDate = new DateOnly(2022, 8, 9),
-                    ImagePath = "example/20000000_000000_0022.png",
+                    ImagePath = "example/20000000_000000_0022.jpg",
                     Author = authors[3],
                     Publisher = publishers[3],
                 }
@@ -430,7 +433,8 @@ namespace BookStore.Data
             return faker.Date.Past(years, baseDate);
         }
 
-        private static string GenerateOrderNumber(DateTime date) {
+        private static string GenerateOrderNumber(DateTime date)
+        {
             var dataFormat = date.ToString("yyyyMMdd_HHmmss");
             var randomCode = faker.Random.AlphaNumeric(4).ToLower();
             var orderNumber = $"{dataFormat}_{randomCode}";
@@ -441,7 +445,7 @@ namespace BookStore.Data
         {
             return new OrderItem
             {
-                UnitPrice = (int)Math.Round(book.ListPrice * (book.Discount/100m), MidpointRounding.AwayFromZero),
+                UnitPrice = (int)Math.Round(book.ListPrice * (book.Discount / 100m), MidpointRounding.AwayFromZero),
                 Quantity = quantity,
                 Book = book,
             };
@@ -460,7 +464,8 @@ namespace BookStore.Data
             return orderItems;
         }
 
-        private static Order GenerateOrder(Member member, List<OrderItem> orderItems, DateTime? orderSeedDate) {
+        private static Order GenerateOrder(Member member, List<OrderItem> orderItems, DateTime? orderSeedDate)
+        {
             DateTime createdAt = GenerateRandomDateBefore(orderSeedDate ?? DateTime.UtcNow);
             return new Order
             {
@@ -493,7 +498,7 @@ namespace BookStore.Data
         }
 
         private static string GenerateRandomShippingNote()
-        { 
+        {
             var shippingNotes = new List<string> {
                 "請勿放在門口",
                 "請放在郵筒內",

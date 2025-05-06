@@ -54,7 +54,7 @@ namespace BookStore.API.Controllers
                 RoleName = isAdmin ? RoleType.Admin.ToString() : RoleType.User.ToString(),
                 MemberId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
             };
-            
+
             return Ok(await _orderService.GetOrderDetailAsync(orderDetailRequest));
         }
 
@@ -70,7 +70,8 @@ namespace BookStore.API.Controllers
         /// <response code="409">庫存不足</response>
         [HttpPost]
         [Authorize(Roles = "User, Admin")]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest createOrderRequest) {
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest createOrderRequest)
+        {
             createOrderRequest.MemberId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var id = await _orderService.CreateOrderAsync(createOrderRequest);

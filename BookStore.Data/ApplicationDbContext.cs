@@ -38,14 +38,26 @@ namespace BookStore.Data
                 .HasIndex(m => m.Isbn)
                 .IsUnique();
 
+            modelBuilder.Entity<Book>()
+                .Property(b => b.ListPrice)
+                .HasColumnType("decimal(18,0)");
+
             modelBuilder.Entity<Order>()
                 .HasIndex(m => m.OrderNumber)
                 .IsUnique();
 
-            // modelBuilder.Entity<Role>().HasData(
-            //    new Role { Id = 1, Name = "Admin" },
-            //    new Role { Id = 2, Name = "User" }
-            // );
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalPrice)
+                .HasColumnType("decimal(18,0)");
+
+            modelBuilder.Entity<OrderItem>()
+                .Property(oi => oi.UnitPrice)
+                .HasColumnType("decimal(18,0)");
+
+            // 另一種配置精度的方式
+            // modelBuilder.Entity<Book>()
+            //     .Property(b => b.ListPrice)
+            //     .HasPrecision(18, 2);
         }
     }
 }

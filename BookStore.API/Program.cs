@@ -5,7 +5,6 @@ using BookStore.Data;
 using BookStore.DTO.Request;
 using BookStore.DTO.Validators;
 using BookStore.Services;
-using BookStore.Services.FileStorageStrategies;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +15,10 @@ using System.Reflection;
 using System.Text;
 using FluentValidation.AspNetCore;
 using BookStore.DTO.Profiles;
+using BookStore.API.Controllers;
+using BookStore.API.Conventions;
+using Microsoft.Extensions.DependencyInjection;
+using BookStore.Services.ImageStorageStrategies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,22 +31,40 @@ builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserInfoContext, UserInfoContext>();
 
-bool enableCloudStorage = args.Contains("--enableCloudStorage");
-if (!enableCloudStorage)
+# region LOCAL 或 ONLINE STORAGE 的依賴注入
+// 從環境變量讀取在線存儲啟用狀態
+string? onlineStorageEnvVar = Environment.GetEnvironmentVariable("ONLINE_STORAGE_ENABLED");
+// 檢查環境變量是否為 null 或空字串，並將其轉換為布林值
+bool isOnlineStorageEnabled = !string.IsNullOrEmpty(onlineStorageEnvVar) && onlineStorageEnvVar.Equals("true", StringComparison.OrdinalIgnoreCase);
+if (!isOnlineStorageEnabled)
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("啟用本地圖片儲存");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Local image storage enabled");
+    Console.WriteLine("# -------------------------------");
     builder.Services.AddScoped<IImageStorageStrategy, LocalImageStorageStrategy>();
-    Console.ResetColor();
 }
 else
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("啟用雲端圖片儲存");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Cloud image storage enabled");
+    Console.WriteLine("# -------------------------------");
     builder.Services.AddScoped<IImageStorageStrategy, CloudImageStorageStrategy>();
-    Console.ResetColor();
 }
-builder.Services.AddControllers();
+Console.ResetColor();
+#endregion
+
+// 註冊 Controllers
+builder.Services.AddControllers(options =>
+{
+    if (builder.Environment.IsProduction()) // 只在生產環境移除指定的控制器
+    {
+        options.Conventions.Add(new RemoveControllersConvention(
+            typeof(TestController)
+        ));
+    }
+});
 #endregion
 
 #region FluentValidation
@@ -116,6 +137,7 @@ builder.Services.AddSwaggerGen(options =>
 #endregion
 
 #region DbContext
+// UseSqlServer 方法強制指定這段連線字串是給 SQL Server 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
@@ -124,6 +146,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings")
 );
+// 環境變數覆蓋 JwtSettings
+builder.Services.PostConfigure<JwtSettings>(options =>
+{
+    var secretFromEnv = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    if (!string.IsNullOrEmpty(secretFromEnv))
+    {
+        options.SecretKey = secretFromEnv;
+    }
+});
 #endregion
 
 # region 設定 JWT 認證
@@ -145,7 +176,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
         };
     });
-# endregion
+#endregion
 
 var app = builder.Build();
 
@@ -160,20 +191,26 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// dotnet run --seed
+#region 資料初始化
 if (args.Contains("--seed"))
 {
     await InitializeDatabaseAsync(app.Services);
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("初始化資料庫完成");
+    Console.WriteLine("# -------------------------------");
+    Console.WriteLine("# Database data initialization completed");
+    Console.WriteLine("# -------------------------------");
     Console.ResetColor();
+    // 初始化後直接結束
+    return;
 }
+# endregion
 
 app.UseAuthentication();  // 確保啟用認證
 app.UseAuthorization();   // 確保啟用授權
 app.UseStaticFiles(); // 確保已經啟用靜態檔案服務
 app.UseMiddleware<ExceptionMiddleware>(); // 全局異常處理器
 
+// 映射路由
 app.MapControllers();
 
 app.Run();
@@ -182,6 +219,9 @@ static async Task InitializeDatabaseAsync(IServiceProvider services)
 {
     using var scope = services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    // 應用所有遷移
+    // await context.Database.MigrateAsync();
 
     context.Database.EnsureDeleted();  // 每次啟動清空
     context.Database.EnsureCreated();  // 重新建表

@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models
 {
-    public class Order {
+    public class Order
+    {
         public int Id { get; set; }
 
         [Required(ErrorMessage = "OrderNubmer is required.")]

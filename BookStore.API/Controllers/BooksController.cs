@@ -90,7 +90,8 @@ namespace BookStore.API.Controllers
         [HttpPatch]
         [Route("visibility")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests) {
+        public async Task<IActionResult> UpdateBooksVisibility(List<BookVisibilityUpdateRequest> requests)
+        {
             await _bookService.UpdateBooksVisibilityAsync(requests);
             return NoContent();
         }
@@ -155,6 +156,14 @@ namespace BookStore.API.Controllers
         public async Task<IActionResult> GetBooksForManagement([FromQuery] BookQueryParameters bookQueryParameters)
         {
             return Ok(await _bookService.GetBooksForManagementAsync(bookQueryParameters));
+        }
+
+        [HttpGet]
+        [Route("/test-docker")]
+        [AllowAnonymous]
+        public IActionResult TestDocker()
+        {
+            return Ok(new { message = "docker OK!" });
         }
     }
 }

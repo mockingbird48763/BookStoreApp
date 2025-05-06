@@ -16,7 +16,10 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5154",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ONLINE_STORAGE_ENABLED": "false",
+        "GOOGLE_APPLICATION_CREDENTIALS": "D:\\secret.json",
+        "GCS_BUCKET_NAME": "book_store_storage_mockingbird48763_v2"
       }
     },
     "IIS Express": {
@@ -24,7 +27,10 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ONLINE_STORAGE_ENABLED": "false",
+        "GOOGLE_APPLICATION_CREDENTIALS": "D:\\secret.json",
+        "GCS_BUCKET_NAME": "book_store_storage_mockingbird48763_v2"
       }
     }
   }

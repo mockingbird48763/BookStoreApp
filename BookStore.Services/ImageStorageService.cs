@@ -25,14 +25,15 @@ namespace BookStore.Services
         {
             using var imageStream = file.OpenReadStream();
             String contentType = file.ContentType.ToLower();
-            if(!IsImageValid(imageStream, contentType)) throw new InvalidImageFormatException("The uploaded image format is not supported.");
+            if (!IsImageValid(imageStream, contentType)) throw new InvalidImageFormatException("The uploaded image format is not supported.");
             String fileName = GenerateFilePath(contentType);
             await _storageStrategy.UploadAsync(fileName, imageStream);
             return fileName;
         }
         private static string GenerateFilePath(String contentType)
         {
-            if (!MimeTypeToFileExtensions.TryGetValue(contentType, out var extensions)) {
+            if (!MimeTypeToFileExtensions.TryGetValue(contentType, out var extensions))
+            {
                 throw new ArgumentException("No valid file extension found for the provided content type.", nameof(contentType));
             }
 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace BookStore.Services.FileStorageStrategies
+namespace BookStore.Services.ImageStorageStrategies
 {
     public class LocalImageStorageStrategy : IImageStorageStrategy
     {
@@ -16,11 +16,14 @@ namespace BookStore.Services.FileStorageStrategies
         {
             var filePath = Path.Combine(_uploadsFolder, fileName);
 
-            try {
+            try
+            {
                 // 將 stream 寫入檔案
                 using var output = new FileStream(filePath, FileMode.Create, FileAccess.Write);
                 await fileStream.CopyToAsync(output);
-            } catch (IOException) {
+            }
+            catch (IOException)
+            {
                 throw new IOException("Failed to save the file on the server.");
             }
         }

@@ -1,10 +1,14 @@
 using BookStore.DTO.Request;
 using BookStore.Models.Enums;
+using Google;
+using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 
 namespace BookStore.API.Controllers
 {
@@ -67,9 +71,10 @@ namespace BookStore.API.Controllers
 
             User.IsInRole("Admin");
             User.IsInRole("Manager");
-            return Ok(new { 
-                userId, 
-                email, 
+            return Ok(new
+            {
+                userId,
+                email,
                 roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(), // ["Admin", "User"]
                 isAdmin = User.IsInRole(RoleType.Admin.ToString()),
                 isUser = User.IsInRole(RoleType.User.ToString()),
@@ -114,8 +119,7 @@ namespace BookStore.API.Controllers
             {
                 await image.CopyToAsync(stream); // 將上傳的檔案寫入指定路徑
             }
-
-            return Ok(new { message = "上傳成功", fileName = $"{datePart}_{randomStr}{fileExtension}" });
+            return Ok(new { message = "Success", fileName = $"{datePart}_{randomStr}{fileExtension}" });
         }
 
         [HttpPost("download-report1")]
@@ -157,6 +161,91 @@ namespace BookStore.API.Controllers
             // memoryStream.Position = 0; // 重置 MemoryStream 的位置以便讀取，配合 leaveOpen: false
             Response.Headers.Append("Content-Disposition", "attachment; filename=report.csv");
             return new FileStreamResult(memoryStream, "text/csv");
+        }
+
+
+        // 金鑰路徑的配置
+        // $env:GOOGLE_APPLICATION_CREDENTIALS="D:\secret.json"
+        // echo $env:GOOGLE_APPLICATION_CREDENTIALS
+
+        // export GOOGLE_APPLICATION_CREDENTIALS="/home/user/secret.json"
+
+        /// <summary>
+        /// 測試 Google Cloud Storage 下載檔案
+        /// </summary>
+        [HttpGet("get-file")]
+        public async Task<IActionResult> GetFile(string fileName)
+        {
+            var client = StorageClient.Create();
+            var stream = new MemoryStream();
+            try
+            {
+                var obj = await client.DownloadObjectAsync("book_store_storage_mockingbird48763_v2", fileName, stream);
+
+                if (obj == null)
+                {
+                    // 檔案找不到的情況
+                    return NotFound("File not found");
+                }
+
+                // 重置流的位置為0，這樣從頭開始讀取
+                stream.Position = 0;
+
+                return File(stream, obj.ContentType, obj.Name);
+            }
+            catch (GoogleApiException apiEx)
+            {
+                // 如果是 Google Cloud Storage API 的錯誤，可以處理它
+                return StatusCode(500, $"Google API Error: {apiEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                // 捕捉其他類型的錯誤
+                return StatusCode(500, $"Unexpected Error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 測試 Google Cloud Storage 上傳檔案
+        /// </summary>
+        [HttpPost("upload-file")]
+        public async Task<IActionResult> AddFile([FromBody] FileUpload fileUpload)
+        {
+            var client = StorageClient.Create();
+            var file = Encoding.UTF8.GetBytes(fileUpload.File);
+
+            var obj = await client.UploadObjectAsync("book_store_storage_mockingbird48763_v2", fileUpload.Name, fileUpload.Type, new MemoryStream(file));
+            return Ok();
+        }
+
+        /// <summary>
+        /// 測試 Google Cloud Storage 簽名 URL
+        /// </summary>
+        [HttpGet("signed-url")]
+        public async Task<IActionResult> GenerateSignedUrl(string fileName)
+        {
+            UrlSigner urlSigner = UrlSigner.FromCredentialFile(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS"));
+            // 簽名可以設置快取，減少阻塞
+            string signedUrl = await urlSigner.SignAsync(
+                bucket: "book_store_storage_mockingbird48763_v2",
+                objectName: fileName,
+                duration: TimeSpan.FromHours(1) // 設定簽名 URL 的有效時間
+            );
+
+            // 如果你不想返回 URL，而是內容本身(文本或圖片(用 byte[]))，你不想暴露 URL 時使用(但暴露此URL，任何人都可以訪問，那簽名就沒有意義)
+            // HttpClient httpClient = new HttpClient(); // 應使用注入的方式創建 HttpClient
+            // HttpResponseMessage response = await httpClient.GetAsync(signedUrl);
+            // string content = await response.Content.ReadAsStringAsync();
+            return Ok(new { signedUrl });
+        }
+
+        public class FileUpload
+        {
+            public required string Name { get; set; }
+            public required string Type { get; set; }
+
+            // 文字檔案的內容
+            public required string File { get; set; }
         }
     }
 }
